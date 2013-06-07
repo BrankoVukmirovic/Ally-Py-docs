@@ -1,4 +1,4 @@
 Ally-Py-docs
 ============
 
-All documentation Ally-Py related
+All Ally-Py related documentation. 
