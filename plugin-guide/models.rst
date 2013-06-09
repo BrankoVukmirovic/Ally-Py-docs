@@ -332,6 +332,7 @@ offset, limit and user query.sample_plugin.impl.user
         @see: IUserService.getUsersByType
         '''
         return self._getAll(User.Type == typeId, q, offset, limit)
+
 The implementation is very easy because it makes use of the _getAll method inherited from EntitySupportAlchemy that allows for an easy get
 of models from database. So now we have a service method that provides user models based on a user type, if we access
 http://localhost/resources/Sample/UserType/1 we get:

@@ -23,7 +23,9 @@ All plugins have the same intial file structure:
 Describing the API
 ------------------
 
-A first example based on a model of a user, with a name and an id number.  Create the module ``user`` in ``sample_plugin.api.user`` containing::
+A first example based on a model of a user, with a name and an id number.  Create the module ``user`` in ``sample_plugin.api.user`` containing:
+
+.. code-block:: python
 
         class User:
                 '''
@@ -33,12 +35,14 @@ A first example based on a model of a user, with a name and an id number.  Creat
                 Name = str
 
 
-.. note:: 
+Add the Ally.py egg to the python path.               
 
-        To enable type hinting in your IDE add ``distribution/components/ally-api.1.0.egg`` to your python path variable.
+add to python path
+        ``distribution/components/ally-api.1.0.egg``
 
-To make the class recognizable by the Ally.py framework, edit the previous code to import the Ally.py model, specify the attribute to use as a unique id as a keyed argument to the model decorator (this is required for all Ally.py models) and specify a domain (similar to a namespace).
-::
+To make the class recognizable by the Ally.py framework, edit the previous code to import the Ally.py model, specify the attribute to use as a unique id by passing it as a keyed argument to the model decorator (this is required for all Ally.py models) and specify a domain (similar to a namespace).
+
+.. code-block:: python
 
    from ally.api.config import model
 
@@ -110,10 +114,8 @@ To complement the model, we need to add a service to deliver instances of the mo
 
 All service interface names start with a capital 'I' followed by the service name and ending in 'Service' and are decorated with ``@service``. This convention simplifies Ally.py inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annoted with the return type. In the previous example, the return type is an interable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
 
-.. TODO:: Re note above, why?
-
 .. TODO:: 
-        This is not totally clear to me. "framework, also each method definition that needs to be considered as exposing response models needs to be decorated with call. We need to annotate the method with the return type of the method in this case is an iterable collection that contains User models. The ally framework uses"
+        [SW] This is not totally clear to me. "framework, also each method definition that needs to be considered as exposing response models needs to be decorated with call. We need to annotate the method with the return type of the method in this case is an iterable collection that contains User models. The ally framework uses"
 
 Implementing the API
 ----------------------------------------------
@@ -248,7 +250,7 @@ So now we have a list of users and we need a way of filtering it for this we hav
 
         ...
 
-.. TODO:: What is the ... here? The rest of the file above? Or continuation below?
+.. TODO:: [SW] What is the "..." here? The rest of the file above? Or continuation below?
 
 Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
 

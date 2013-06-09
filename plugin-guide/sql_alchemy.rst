@@ -1,14 +1,14 @@
 Using SQLAlchemy
 =================
 
-Continuing the example from :ref:`Creating`, we'll make a persistent User model stored in a database. 
-
-.. TODO:: Add to Python path, is this for include? Or for editor, etc? 
+Continuing the example from :ref:`Creating`, we'll make a persistent user model stored in a database. We need to add the SQLAlchemy egg to the python path. 
 
 add to python path
         ``distribution/libraries/SQLAlchemy-0.7.1-py3.2.egg``
 
-To use SQLAlchemy we define a ``MetaData`` object in ``sample_plugin.meta.__init__`` that is used for creating the table::
+Then to use SQLAlchemy we define a ``MetaData`` object in ``sample_plugin.meta.__init__`` that is used to create the table:
+
+.. code-block:: python
 
         from sqlalchemy.schema import MetaData
 
@@ -17,7 +17,13 @@ To use SQLAlchemy we define a ``MetaData`` object in ``sample_plugin.meta.__init
         meta = MetaData()
         # Provides the meta object for SQL alchemy.
 
-Next we create a user module in ``sample_plugin.meta.user`` to map the User model to a database table:: 
+
+After adding the Ally.py SQLAlchemy egg to the Python path, create a user module in ``sample_plugin.meta.user`` to map the User model to a database table: 
+
+add to python path
+        ``distribution/components/ally-core-sqlalchemy.1.0.egg``
+
+.. code-block:: python
 
         '''
         Database mapping for the user model.
@@ -40,33 +46,17 @@ Next we create a user module in ``sample_plugin.meta.user`` to map the User mode
         # map User entity to defined table (above)
         User = mapperModel(User, table)
 
-We have defined a SQLAlchemy table called ``sample_user`` that has two columns, ``id`` and ``name``. Each column linked to the REST model has the attribute it is linked to in the key defenition. Then we map the table to the REST model. 
+We have defined a SQLAlchemy table called ``sample_user`` that has two columns, ``id`` and ``name``. Each column linked to the REST model has the attribute it is linked to in the key definition. Then we map the table to the REST model. 
 
-add to python path
-        ``distribution/components/ally-core-sqlalchemy.1.0.egg``
 
 Implementing Database Queries
 ------------------------------
 
-We now have a mapped User model class that we can easily use in our implementations, keep in mind that you need to use the User class from the meta in order to be able to use it with SQL Alchemy. Now we can proceed to the implementation in order to adjust it to get the data from database.  sample_plugin.impl.user :
+To add session support to the service implementation, extend ``SessionSupport``, the Ally.py framework starts a transaction when a request is made, and ends it after the response is delivered. 
 
-.. code-block:: python
+.. NOTE:: If you implement the ``__init__`` method, you must call call the ``SessionSupport.__init__`` within your implementation.
 
-        from sample_plugin.api.user import IUserService
-        from ally.support.sqlalchemy.session import SessionSupport
-
-        # --------------------------------------------------------------------
-
-        class UserService(IUserService, SessionSupport):
-        '''
-        Implementation for @see: IUserService
-        '''
-
-First we need to add session support to the service implementation so in order to do this we extend the SessionSupport, now we have a session
-assigned on our service. If you implement the __init__ method do not forget to also call the SessionSupport.__init__. The session is
-automatically handeled by the ally framework SQL alchemy component so there is no need to begin or end a transaction. The transaction starts
-when the request is made and ends after the response has been delivered. Now we need to adjust the getUsers method to deliver the users from
-the database.  sample_plugin.impl.user :
+We now have a mapped User model class that we can use in our implementation, you need to use the ``User`` class from ``sample_plugin.meta`` to use SQLAlchemy. The next step is to edit the ``getUsers`` implementation in ``sample_plugin.impl.user`` to query ``User`` information from the database. 
 
 .. code-block:: python
    
@@ -87,7 +77,9 @@ the database.  sample_plugin.impl.user :
                 '''
                 return self.session().query(User).all()
 
-Notice that we are not using the User model from the sample_plugin.api.user module we are now using it from sample_plugin.meta.user module. As you see is very simple to get all the users from the database this is because the User model has been mapped and now SQLalchemy now how to handle it. Now the problem is that there is no user in the database table, so if we want to add users we need to create an insert method. We need first to specify in the sample_plugin.api.user the new functionality we require so we need to add the method to the IUserService class: sample_plugin.api.user:
+A database query to an empty database is not of much use, we need to add a method to the ``IUserService`` class in ``sample_plugin.api.user``, and then write the service implementation to populate the database in ``sample_plugin.impl.user``.
+
+``sample_plugin.api.user``:
 
 .. code-block:: python
    
@@ -119,11 +111,17 @@ Notice that we are not using the User model from the sample_plugin.api.user modu
                         '''
                         Persist the user model.
                         '''
+                        
+The ``insert`` method handles the insertion of the user model, and is annotated with the input and output types. The input is a user model object and the output is the user id.
 
-The method will handle the insert of the user model. We need to annotate the insert method with the types of the input an output, in this case the
-input is a User model and the output is the User.Id based on this annotations the ally framework knows how to handle the method. The models
-classes and models classes attributes are used as types for defining service methods as you seen also with the getUser method. Now lets see
-how we will implement the insert method.  sample_plugin.impl.user :
+When implementing the insert method in ``sample_plugin.impl.user`` we need to convert the user model from ``sample_plugin.api.user`` to the user model in ``sample_plugin.meta.user`` which SQLAlchemy understands, in ``sample_plugin.impl.user``:
+
+.. code-block:: python
+
+        mapped = User()
+                if User.Name in user: mapped.Name = user.Name
+
+The following code, ``sample_plugin.impl.user``, checks if the ``User.Name`` attribute is specified for the user instance, and if it is, sets it on the corresponding mapped object. To insert the mapped User object into the database, add it to the session, and flush the session to get the inserted users Id. 
 
 .. code-block:: python
 
@@ -154,21 +152,16 @@ how we will implement the insert method.  sample_plugin.impl.user :
                                 log.exception('Could not insert %s' % user)
                         return mapped.Id
 
-The first problem is that the user attribute will contain a User model that is from sample_plugin.api.user but SQL Alchemy only knows how to
-handle the User model from sample_plugin.meta.user basically the mapped model so we need to make this conversion this is why we have sample_plugin.impl.user:
-
-.. code-block:: python
-
-        mapped = User()
-                if User.Name in user: mapped.Name = user.Name
-
-
-In the second line we actually check is the User.Name attribute is specified for the user instance, if specified we will also set it on our mapped object. After we have the mapped User object we need to persist it, in order to do this we are adding it to the session, the flush is necessary in order to get an Id on our mapped User object in order to be able to return it. We also added a log in order to report any problem that might appear while we are inserting the User object into the database.
-
 Configuring the Database
 -------------------------------
 
-We have now the means of adding users in the database and also to fetch them but there is still the problem of configuring the database we need to use. First we need to define the database setup module, so we create the db_sample module in the __plugin__.sample_plugin package.  __plugin__.sample_plugin.db_sample :
+We can add users to the database, and query the database for existing users, but we must specify which database we are using. Define the database setup module, in ``db_sample`` in ``__plugin__.sample_plugin.db_sample``:
+
+``database_url()`` specifies the database URL that SQLAlchemy connects to, in this case ``sample.db``. This SQLite database is created inside the ``distribution`` folder if it does not already exist. 
+
+``alchemyEngine()`` is the SQLAlchemy setup function. Note that the database URL is specified using the configuration function ``database_url`` explained above, so that the Ally.py Inversion of Control container can override this configuration if necessary.  ``alchemySessionCreator()`` creates sessions whenever a service method is invoked. 
+
+The ``createTables()`` setup function creates tables in the database. When the application starts, all tables defined in meta that do not already exist are created.
 
 .. code-block:: python
 
@@ -201,74 +194,20 @@ We have now the means of adding users in the database and also to fetch them but
         def createTables():
                 meta.create_all(alchemyEngine())
 
-We will take each function in the previous code example step by step in order to see the role of each one: 
-
-.. code-block:: python
-
-        '''
-        Contains the database setup for the samples.
-        '''
-
-        from ally.container import ioc
-        from sample_plugin.meta import meta
-        from sqlalchemy.engine import create_engine
-        from sqlalchemy.engine.base import Engine
-        from sqlalchemy.orm.session import sessionmaker
-
-        # --------------------------------------------------------------------
-        @ioc.config
-        def database_url():
-                '''The database URL for the samples'''
-                return 'sqlite:///sample.db'
-
-        @ioc.entity
-        def alchemyEngine() -> Engine:
-                engine = create_engine(database_url())
-                return engine
-
-        @ioc.entity
-        def alchemySessionCreator():
-                return sessionmaker(bind=alchemyEngine())
-
-        @ioc.start
-        def createTables():
-                meta.create_all(alchemyEngine())
-
-        @ioc.config
-        def database_url():
-                '''The database URL for the samples'''
-                return 'sqlite:///sample.db'
-
-This function provides the database URL that will be used by SQL Alchemy to connect to a database. In this case we have provided a SQLite database that will be in the "sample.db" file, when the application will start this file will be created in the distribution folder if it doesn't exist already.  You will be able to change this with other databases like MySQL for instance by changing the entry associated with this configuration in the
-"plugins.properties" file.
-
-.. code-block:: python
-
-        @ioc.entity
-        def alchemyEngine() -> Engine:
-                engine = create_engine(database_url())
-                return engine
-
-This entity setup functions create the SQL Alchemy engine this is more of a SQL Alchemy feature, the only thing I want to point out is that in order to get the URL for the database engine we are calling the configuration function database_url that returns the URL. This is done because the actual returned string that contains the URL might be changed by configurations in the "plugins.properties" file so is very important to actually place all configurations in configuration setup function in order to allow the IoC container to override the configurations if it might be required.
-
-.. code-block:: python
-
-        @ioc.entity
-        def alchemySessionCreator():
-                return sessionmaker(bind=alchemyEngine())
-
-This will provide the session creator that will be used for creating the sessions whenever a service method is invoked, also the session creator is
-something from SQL Alchemy that we just take advantage of.
-
-.. code-block:: python
-
-        @ioc.start
-        def createTables():
-                meta.create_all(alchemyEngine())
 
 
-This start event setup function is used to create the tables in the database. When the application starts all the tables in the meta we used will be created if they do not exist already, so this will ensure us that we will have a user_sample table in the database when the application starts.  Now we have the database configuration made and we ensured also that the tables are created, now we need to adapt the service to automatically handle the sessions. A session needs to be created using the session creator whenever a method (that belongs to the service API) of the service is invoked, after the method has been invoked the session is closed with a commit if no exception has occur or with a rollback if there was an exception. This is the general view for the session handling but there are some exceptions, if for instance while a service method is processed and another service method is used while processing and that service uses the same session creator (same database) no new session or transaction will be created but instead the same one will be used. So in order to have this session handling we need to wrap the service
+
+
+
+
+
+
+
+
+
+A session needs to be created using the session creator whenever a method (that belongs to the service API) of the service is invoked, after the method has been invoked the session is closed with a commit if no exception has occur or with a rollback if there was an exception. This is the general view for the session handling but there are some exceptions, if for instance while a service method is processed and another service method is used while processing and that service uses the same session creator (same database) no new session or transaction will be created but instead the same one will be used. So in order to have this session handling we need to wrap the service
 implementation with a proxy that does that, so lets go back to the __plugin__.sample_plugin.service configuration module.  __plugin__.sample_plugin.service:
+
 
 .. code-block:: python
 
@@ -293,9 +232,7 @@ implementation with a proxy that does that, so lets go back to the __plugin__.sa
         def register():
                 registerService(userService())
 
-So instead of returning the actual instance of UserService implementation we first create a proxy class for the API service interface IuserService this proxy class contains all the methods that are defined in the API, then we create an instance of this proxy class that will delegate all the calls tothe actual user service implementation ant this proxy will be the returned instance, but before we return this instance we are going to bind the session handling to all the proxy methods.  Now we have a service that uses a database, just added to the distribution and run the application. After the application has been started you should see the sample.db file in the distribution folder. If you access http://localhost/resources/Sample/User you will get an empty list as the response since there are no users in the user_sample database table. So in order to add a user you need to use a tool that will allow you to make POST requests, I use restclient-ui-2.3.3-jar-with-dependencies.jar but you can use any tool that you are conformable with.
-
-method 
+So instead of returning the actual instance of UserService implementation we first create a proxy class for the API service interface IuserService this proxy class contains all the methods that are defined in the API, then we create an instance of this proxy class that will delegate all the calls tothe actual user service implementation ant this proxy will be the returned instance, but before we return this instance we are going to bind the session handling to all the proxy methods.  Now we have a service that uses a database, just added to the distribution and run the application. After the application has been started you should see the sample.db file in the distribution folder. If you access http://localhost/resources/Sample/User you will get an empty list as the response since there are no users in the user_sample database table.method 
         POST
 Accept 
         xml
@@ -318,8 +255,6 @@ After making this post you will receive as a response the id of the newly insert
         <User>
                 <Id>1</Id>
         </User>
-
-You can find the packaged egg here.
 
 Querying
 --------

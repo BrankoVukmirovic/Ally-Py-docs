@@ -19,7 +19,7 @@ For example the introspection functionality in Ally.py is provided by two plugin
 * ``plugin.introspection`` which provides the components and plugins that are active in the current distribution 
 * ``plugin_.introspection_request`` the introspection for the possible requests that can be made
 
-.. TODO:: Not sure about the difference here
+.. TODO:: [SW] Not sure about the difference here?
 
 The main package for both plugins is ``introspection``, which contains all the configuration modules. The Inversion of Control dependency injection container ignores any subpackages.
 
