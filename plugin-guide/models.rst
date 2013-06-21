@@ -1,10 +1,12 @@
 Associating and Extending Models
 =====================================
 
-Associating two models implies that one model contains a reference to another model. This requires modifcation of the model APIs and meta functions.
+Associating two models implies that one model contains a reference to another model. This requires modifcation of that model's API and meta functions.
 
 .. 
-        The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, so in order to associate one entity with another entity we need a new entity. Lets say that to the User model we want to associate a UserType model, first we will need to create and API and implementation for the user type as we did for the user.  sample_plugin.api.user_type:
+        The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, 
+        
+To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``sample_plugin.api.user_type``:
 
 .. code-block:: python
 
@@ -36,7 +38,7 @@ Associating two models implies that one model contains a reference to another mo
         The user type service.
         '''
 
-This is the user type API, is actually the user API adjusted to represent the user type, and now the meta.sample_plugin.meta.user_type:
+The UserType API, is simiar to the User API. We also need to edit ``meta.sample_plugin.meta.user_type``:
 
 .. code-block:: python
 
@@ -55,7 +57,9 @@ This is the user type API, is actually the user API adjusted to represent the us
         # map User Type entity to defined table (above)
         UserType = mapperModel(UserType, table)
 
-We have defined the sample_user_type table almost like the sample_user table except that we had declared the name as a unique column, we don't want multiple types with the same name. Last but not least we have the implementation.  sample_plugin.impl.user_type
+
+
+``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``sample_plugin.impl.user_type``:
 
 .. code-block:: python
 
@@ -73,7 +77,8 @@ We have defined the sample_user_type table almost like the sample_user table exc
         def __init__(self):
         EntityServiceAlchemy.__init__(self, UserType, QUserType)
 
-After the user type modules have been defined you just need to start the application and because of the AOP configurations we have made the user type will appear automatically as one of the REST services that can be accessed via http://localhost/resources/Sample/UserType. We will have of course an empty list here to begin with, so lets insert a user type.
+
+After defining the UserType modules, start the application and the Aspect-Oriented configuration will automatically populate the REST services in `\Sample\UserType <http://localhost/resources/Sample/UserType>`_. This list is initially empty, so populate it with a POST request:
 
 method 
         POST
@@ -83,25 +88,23 @@ Accept
 
 Content-Type
         xml
+URL     
+        http://localhost/resources/Sample/UserType
+BODY
+   .. code-block:: xml
 
-http://localhost/resources/Sample/UserType
+           <UserType>
+                   <Name>Administrator</Name>
+           </UserType>
+RESPONSE
+   .. code-block:: xml
 
-.. code-block:: xml
+           <?xml version="1.0" encoding="UTF-8"?>
+           <UserType href="http://localhost/resources/Sample/UserType/1">
+                   <Id>1</Id>
+           </UserType>
 
-        <UserType>
-                <Name>Administrator</Name>
-        </UserType>
-
-RESPONSE:
-
-.. code-block:: xml
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <UserType href="http://localhost/resources/Sample/UserType/1">
-                <Id>1</Id>
-        </UserType>
-
-If you try to make the POST again you will receive as a response,
+If you try to resend the POST request you will receive the following response:
 
 .. code-block:: xml
 
@@ -111,7 +114,9 @@ If you try to make the POST again you will receive as a response,
                 <code>404</code>
         </error>
 
-this is because we declared the name as unique and the binded validation automatically checks if the provided name is not present in the database. The sample until this point can be found here.  Ok so now we have the User model and the UserType model we just have to see how we can specify to the user the user type, first we need to change the user API.  sample_plugin.api.user
+The `name` is declared as unique, so the insertion request checks that the value is not already present in the database.
+
+Editing the User model to reference the ``UserType`` model by changing the user API in ``sample_plugin.api.user``:
 
 .. code-block:: python
 
@@ -132,10 +137,9 @@ this is because we declared the name as unique and the binded validation automat
         Type = UserType
         ...
 
-We added to the User model a new attribute called Type, we assign as a value the model class we want to associate with, in this case the
-UserType, the ally framework knows now that Type is actually a reference to a UserType object. The actual value that is contained in Type is the
-model id value of the UserType, basically the Type will not contain an entire UserType object it will contain just an id of a UserType. Now we
-need to modify the meta in order to contain also the type.sample_plugin.meta.user
+The new User model has an ``Type`` attribute with a value of ``UserType``, which the Ally.py framework detects as reference to an object. The actual value of ``Type`` is the model ``id`` of ``UserType``. 
+
+Modifying the meta class to include ``Type`` in ``sample_plugin.meta.user``:
 
 .. code-block:: python
 
@@ -154,6 +158,7 @@ need to modify the meta in order to contain also the type.sample_plugin.meta.use
         # map User entity to defined table (above)
         User = mapperModel(User, table)
 
+        
 We added a new column to the table that is a foreign key to the user type table, you notice that when we define relations with other models we
 always need to use the meta class, in this case the UserType mapped in the module sample_plugin.meta.user_type. Because the logic in the
 services is not modified by the newly added information we don't need to modify anything in the service APIs or implementations.
@@ -170,24 +175,22 @@ Content-Type
         xml
 URL
         http://localhost/resources/Sample/User
+BODY
+   .. code-block:: xml
 
-.. code-block:: xml
+           <User>
+                   <Name>John Doe</Name>
+           </User>
+RESPONSE
+   .. code-block:: xml
 
-        <User>
-                <Name>John Doe</Name>
-        </User>
-
-RESPONSE:
-
-.. code-block:: xml
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <error>
-                <code>404</code>
-                <User>
-                        <Type>Expected a value</Type>
-                </User>
-        </error>
+           <?xml version="1.0" encoding="UTF-8"?>
+           <error>
+                   <code>404</code>
+                   <User>
+                           <Type>Expected a value</Type>
+                   </User>
+           </error>
 
 So we get an error of Invalid resource because the User.Type is not specified, that is because when we defined the table we set the nullable flag to false for the Type column. Since our database is empty lets insert a user type.
 
@@ -287,7 +290,7 @@ Now we have successfully inserted a user in the database that also has a type, s
 
 , you have the new user model with a user type reference. The sample code can be found here.
 
-Extending
+Extending Models
 -------------------------------
 
 The extending is when a service provides models based on another model id, even if the provided models are not associated with the other

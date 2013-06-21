@@ -57,5 +57,4 @@ The ``<main package>`` contains two sub packages:
 
 Any other modules that are defined in the plugin and are not in this packages create a heavy dependency, which means that the plugins need to be part of the same application distribution.
 
-..
-        Unzip the `example egg file <source_code/sample_plugin-1.0.dev-py3.2.egg>`_ to see the file structure.
+Unzip the `example egg file <https://github.com/sourcefabric/Ally-Py-docs/blob/master/plugin-guide/source_code/01_-_organize_a_plugin_sample/sample_plugin-1.0.dev-py3.2.egg>`_ to see the file structure.

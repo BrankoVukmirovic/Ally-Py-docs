@@ -363,5 +363,6 @@ We added offset and limit attributes of type integer to the ``getUsers`` method.
 
 Because the ``getUsers`` implementation method has a default value for `limit` of None instead of 10, whenever ``getUsers`` is called from an external request the limit of 10 is used, whenever ``getUsers`` is called from an internal request the None limit is used. 
 
-Provide the limit and offset as parameters in the URL `User?offset=1&limit=1 <http://localhost/resources/Sample/User?offset=1&limit=1>`_
+Provide the limit and offset as parameters in the URL `User?offset=1&limit=1 <http://localhost/resources/Sample/User?offset=1&limit=1>`_. Download the `example egg <https://github.com/sourcefabric/Ally-Py-docs/blob/master/plugin-guide/source_code/03_-_query_sql_alchemy_plugin_sample/sample_plugin-1.0.dev-py3.2.egg>`_
+
 

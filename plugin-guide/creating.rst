@@ -272,4 +272,6 @@ The ``getUsers`` method now takes an query object instance as an optional parame
 
 ``getUsers`` now returns 10 users, and checks if query object exists. If a query object exists and has a specified like value in the name criteria, we generate a regular expression and filter the user list accordingly. If the ascending flag exists, we sort the user list in ascending order. 
 
-Redeploy the plugin then view all ten users at http://localhost/resources/Sample/User. View only the seventh user at http://localhost/resources/Sample/User?name=%7 and sort the user list at http://localhost/resources/Sample/User?asc=name.
+Redeploy the plugin then view all ten users at `/Sample/User <http://localhost/resources/Sample/User>`_. View only the seventh user at `/Sample/User?name=%7 <http://localhost/resources/Sample/User?name=%7>`_ and sort the user list at `/Sample/User?asc=name <http://localhost/resources/Sample/User?asc=name>`_.
+
+Download the `example egg <https://github.com/sourcefabric/Ally-Py-docs/blob/master/plugin-guide/source_code/02_-_query_plugin_sample/sample_plugin-1.0.dev-py3.2.egg>`_
