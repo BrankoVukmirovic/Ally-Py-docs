@@ -3,27 +3,12 @@
 Creating a plugin
 =================
 
-All plugins have the same intial file structure:
-
-* ``plugin`` # the setup package
-   + ``_init_.py`` # the init module of the package
-   + ``sample_plugin`` # the unique configuration package
-      - ``__init__.py``
-* ``sample_plugin`` # the main package
-   + ``__init__.py``
-   + ``api`` # the API package
-      - ``__init__.py``
-   + ``meta`` # the meta package 
-      - ``__init__.py``
-   + ``impl`` # the implementation package
-      - ``__init__.py``
-* ``build-plugin.ant`` # the ant build file for the plugin
-
+In this guide We will create a simple plugin called ``sample_plugin`` with the structure described in :ref:`Structure`.
 
 Describing the API
 ------------------
 
-A first example based on a model of a user, with a name and an id number.  Create the module ``user`` in ``sample_plugin.api.user`` containing:
+The first example is based on a model of a user, with a name and an id number.  Create the module ``user`` in ``sample_plugin.api.user`` containing:
 
 .. code-block:: python
 
@@ -54,7 +39,7 @@ To make the class recognizable by the Ally.py framework, edit the previous code 
         Id = int
         Name = str
 
-Without a domain, the model is accessible at `/User <http://localhost/resources/User>`_ , but with domain set to 'Sample' the domain is accessible at `Sample/User <http://localhost/resources/Sample/User>`_.
+Without a domain, the model is accessible at `User <http://localhost/resources/User>`_ , but with domain set to 'Sample' the domain is accessible at `Sample/User <http://localhost/resources/Sample/User>`_.
 
 To reuse a domain definition in various modules or plugins, define a domained model decorator in the ``sample_plugin.api.__init__`` module::
 
@@ -120,8 +105,7 @@ All service interface names start with a capital 'I' followed by the service nam
 Implementing the API
 ----------------------------------------------
 
-After defining the API we can create an implementation based upon it, returning a list with one user model at the address http://localhost/resources/Sample/User .
-:
+After defining the API we can create an implementation based upon it, returning a list with one user model at the address `Sample/User <http://localhost/resources/Sample/User>`_:
 
 .. code-block:: xml
 
@@ -190,24 +174,6 @@ Packaging and Deploying
 
 The plugin is now fully functional, but we need to package it up for deployment to the application using ``build-plugin.ant`` :
 
-.. code-block:: xml
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <project name="create-a-plugin" default="build" basedir=".">
-                <property name="destination" value="." />
-                <property name="egg" value="02 - plugin sample.1.0.egg" />
-                <target name="clean">
-                        <delete file="${destination}/${egg}" />
-                </target>
-                <target name="build" depends="clean">
-                        <zip destfile="${destination}/${egg}" basedir=".">
-                                <exclude name="**/__pycache__/" />
-                                <exclude name="/.*" />
-                                <exclude name="/*.egg" />
-                        </zip>
-                </target>
-        </project>
-
 The ant script creates ``02 - plugin sample.1.0.egg`` in the plugin ``source`` folder. To deploy the plugin, copy the file into the ``distribution/plugin/`` folder of your application. If the application is running on localhost port 80, access your plugin at http://localhost/resources and verify that the resource SampleUser exists:
 
 .. code-block:: xml
@@ -217,10 +183,10 @@ The ant script creates ``02 - plugin sample.1.0.egg`` in the plugin ``source`` f
                 ...
         </Resources>
 
-Querying
-------------
+Querying and Filtering
+------------------------
 
-So now we have a list of users and we need a way of filtering it for this we have the query objects.sample_plugin.api.user
+To filter the list of users use ``@query`` as shown in ``objects.sample_plugin.api.user``:
 
 .. code-block:: python
 

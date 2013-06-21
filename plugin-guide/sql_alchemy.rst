@@ -1,7 +1,9 @@
+.. _SQLAlchemy:
+
 Using SQLAlchemy
 =================
 
-Continuing the example from :ref:`Creating`, we'll make a persistent user model stored in a database. We need to add the SQLAlchemy egg to the python path. 
+Continuing the example from :ref:`Creating`, we will make user model persistant by storing it in a database. We need to add the SQLAlchemy egg to the python path. 
 
 add to python path
         ``distribution/libraries/SQLAlchemy-0.7.1-py3.2.egg``
@@ -152,6 +154,31 @@ The following code, ``sample_plugin.impl.user``, checks if the ``User.Name`` att
                                 log.exception('Could not insert %s' % user)
                         return mapped.Id
 
+method
+        POST
+Accept 
+        xml
+Content-Type
+        xml
+URL       
+        http://localhost/resources/Sample/User
+
+.. code-block:: xml
+
+        <User>
+                <Name>John Doe</Name>
+        </User>
+
+After making this post you will receive as a response the id of the newly inserted user:
+
+.. code-block:: xml
+
+        <?xml version="1.0" encoding="ISO-8859-1"?>
+        <User>
+                <Id>1</Id>
+        </User>
+
+
 Configuring the Database
 -------------------------------
 
@@ -195,19 +222,13 @@ The ``createTables()`` setup function creates tables in the database. When the a
                 meta.create_all(alchemyEngine())
 
 
+Sessions are created using the session creator whenever a service API method is invoked. After the method has been invoked the session is closed, either with a commit (when no exception has occurred) or with a rollback (if an exception has occured).
 
+To prevent multiple methods using the same session, we need to wrap the service implementionation in a proxy.
 
-
-
-
-
-
-
-
-
-A session needs to be created using the session creator whenever a method (that belongs to the service API) of the service is invoked, after the method has been invoked the session is closed with a commit if no exception has occur or with a rollback if there was an exception. This is the general view for the session handling but there are some exceptions, if for instance while a service method is processed and another service method is used while processing and that service uses the same session creator (same database) no new session or transaction will be created but instead the same one will be used. So in order to have this session handling we need to wrap the service
-implementation with a proxy that does that, so lets go back to the __plugin__.sample_plugin.service configuration module.  __plugin__.sample_plugin.service:
-
+.. TODO:: [SW] Not really sure why wrapping this in a proxy fixes the problem.
+ 
+Editing the configuration module in ``__plugin__.sample_plugin.service``:
 
 .. code-block:: python
 
@@ -232,34 +253,14 @@ implementation with a proxy that does that, so lets go back to the __plugin__.sa
         def register():
                 registerService(userService())
 
-So instead of returning the actual instance of UserService implementation we first create a proxy class for the API service interface IuserService this proxy class contains all the methods that are defined in the API, then we create an instance of this proxy class that will delegate all the calls tothe actual user service implementation ant this proxy will be the returned instance, but before we return this instance we are going to bind the session handling to all the proxy methods.  Now we have a service that uses a database, just added to the distribution and run the application. After the application has been started you should see the sample.db file in the distribution folder. If you access http://localhost/resources/Sample/User you will get an empty list as the response since there are no users in the user_sample database table.method 
-        POST
-Accept 
-        xml
-Content-Type
-        xml
-URL       
-        http://localhost/resources/Sample/User
+Instead of returning the instance of UserService directly, a proxy containing all the of the methods definied in the API service interface ``IuserService`` is returned. The proxy delegates calls to the actual user service implementation and handles the session management for all the methods.
+        
+Now when you run the application you will see ``sample.db`` inside the distribution folder. If you access `resources/Sample/User <http://localhost/resources/Sample/User>`_ the response is an empty list, because there are no user in the database.
 
-.. code-block:: xml
+Querying the Database
+-------------------------------- 
 
-        <User>
-                <Name>John Doe</Name>
-        </User>
-
-After making this post you will receive as a response the id of the newly inserted user:
-
-.. code-block:: xml
-
-        <?xml version="1.0" encoding="ISO-8859-1"?>
-        <User>
-                <Id>1</Id>
-        </User>
-
-Querying
---------
-
-We have seen how to do the simple implementation lets see how we will handle the querying, you just need to use the user API from the query example in the "create a plugin" chapter but keep also the insert service method. Because now the users are from the database we cannot know how many users we will have in the response, so in order to avoid huge responses we will introduce the offset and limit for the users list.sample_plugin.impl.user:
+When querying users from a database you cannot know how many users the response will contain, so to avoid huge responses we need to implement an offset and limit for the query in ``list.sample_plugin.impl.user``:
 
 .. code-block:: python
 
@@ -307,7 +308,8 @@ We have seen how to do the simple implementation lets see how we will handle the
                         Persist the user model.
                         '''
 
-We added an offset and limit attribute of type integer in the getUsers method. The ally framework knows how to handle free parameters as long as they have a default value and are of a primitive type. Now we need to adjust the implementation.sample_plugin.impl.user:
+
+We added offset and limit attributes of type integer to the ``getUsers`` method. The Ally.py framework automatically handles free parameters as long as they have a default value and are of a primitive type. Adjusting ``implementation.sample_plugin.impl.user``:
 
 .. code-block:: python
 
@@ -356,4 +358,10 @@ We added an offset and limit attribute of type integer in the getUsers method. T
                                 log.exception('Could not insert %s' % user)
                         return mapped.Id
 
-You will notice that the getUsers implementation method has a default value for limit set to None instead of 10, the effect of this is that whenever the getUsers is called using external requests the API limit of 10 will be used, if is made internal (from a different plugin for example) the None limit will apply. Now in order to provide the limit and offset like this http://localhost/resources/Sample/User?offset=1&limit=1. 
+
+
+
+Because the ``getUsers`` implementation method has a default value for `limit` of None instead of 10, whenever ``getUsers`` is called from an external request the limit of 10 is used, whenever ``getUsers`` is called from an internal request the None limit is used. 
+
+Provide the limit and offset as parameters in the URL `User?offset=1&limit=1 <http://localhost/resources/Sample/User?offset=1&limit=1>`_
+

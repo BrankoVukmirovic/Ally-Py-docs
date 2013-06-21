@@ -1,10 +1,28 @@
+.. _Structure:
+
 Plugin structure
 ================
 
-Each plugin is composed of two packages:
+All plugins have the same intial file structure:
 
-* ``_plugin_`` contains the configuration files that expose the plugin services. This package is automatically scanned by the application distribution loader and interpreted by the Inversion of Controls dependency injection container.
-* ``<main package>`` contains the implementation of the plugin. The name of the main package must be lower case, with words separated by underscores. Plugins that share a main package name can have sub packages to separate functionality within the plugin group. 
+* ``plugin`` # the setup package
+   + ``_init_.py`` # the init module of the package
+   + ``sample_plugin`` # the unique configuration package
+      - ``__init__.py``
+* ``sample_plugin`` # the main package
+   + ``__init__.py``
+   + ``api`` # the API package
+      - ``__init__.py``
+   + ``meta`` # the meta package 
+      - ``__init__.py``
+   + ``impl`` # the implementation package
+      - ``__init__.py``
+* ``build-plugin.ant`` # the ant build file for the plugin
+
+The two main components are described below in more detail:
+
+* ``plugin`` contains the configuration files that expose the plugin services. This package is automatically scanned by the application distribution loader and interpreted by the Inversion of Control dependency injection container.
+* ``sample_plugin`` contains the implementation of the plugin. The name of the main package must be lower case, with words separated by underscores. Plugins that share a main package name can have sub packages to separate functionality within the plugin group. 
 
 Plugins also contain an ant build file called ``build-plugin.ant`` which packages the plugin to an egg file used by the application distribution.
 

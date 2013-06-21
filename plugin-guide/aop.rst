@@ -1,7 +1,9 @@
 Using Aspect-Oriented Programming
 ============================================================
 
-The drawback when using dependency injection is that we need to write a lot of configuration code so we need AOP (you can read more here) in order to reduce the amount of code we write for the configurations of the plugins.  
+Dependency injection programming requires a lot of configuration code, but Ally.py reduces the need for plugin configuration by using Aspect-Oriented programming.
+
+Editing the example from :ref:`SQLAlchemy`
 
 Lets take as an example the plugin from "using sql alchemy" chapter, we needed to write a function in order to create a service instance for UserService, when we are going to have tens and maybe hundreds of such services it might become annoying so the solution is to adopt conventions and use AOP for configuring the plugin.  __plugin__.sample_plugin.service :
 
