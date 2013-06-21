@@ -56,3 +56,6 @@ The ``<main package>`` contains two sub packages:
 * ``<main package>.**.meta`` contains modules that enhance the REST models, such as database mappings of the models. Whenever another plugin uses modules from this package it is considered to have a medium dependency, which means that the plugins can run on different servers but they have to use the same database.
 
 Any other modules that are defined in the plugin and are not in this packages create a heavy dependency, which means that the plugins need to be part of the same application distribution.
+
+..
+        Unzip the `example egg file <source_code/sample_plugin-1.0.dev-py3.2.egg>`_ to see the file structure.

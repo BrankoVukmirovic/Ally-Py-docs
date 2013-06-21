@@ -1,7 +1,10 @@
 Associating and Extending Models
 =====================================
 
-The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, so in order to associate one entity with another entity we need a new entity. Lets say that to the User model we want to associate a UserType model, first we will need to create and API and implementation for the user type as we did for the user.  sample_plugin.api.user_type:
+Associating two models implies that one model contains a reference to another model. This requires modifcation of the model APIs and meta functions.
+
+.. 
+        The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, so in order to associate one entity with another entity we need a new entity. Lets say that to the User model we want to associate a UserType model, first we will need to create and API and implementation for the user type as we did for the user.  sample_plugin.api.user_type:
 
 .. code-block:: python
 
