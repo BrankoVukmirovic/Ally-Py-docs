@@ -216,8 +216,6 @@ To filter the list of users use ``@query`` as shown in ``objects.sample_plugin.a
 
         ...
 
-.. TODO:: [SW] What is the "..." here? The rest of the file above? Or continuation below?
-
 Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
 
 .. code-block:: python 

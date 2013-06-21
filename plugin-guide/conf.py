@@ -306,4 +306,4 @@ epub_copyright = u'2013, Samuel Wright'
 #epub_use_index = True
 
 # Include TODO items
-todo_include_todos = True
+todo_include_todos = False

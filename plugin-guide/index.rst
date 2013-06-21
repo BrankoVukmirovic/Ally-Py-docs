@@ -12,9 +12,6 @@ Contents:
    aop.rst
    models.rst
 
-   todo.rst
-
-
 ..
   Indices and tables
   ==================
