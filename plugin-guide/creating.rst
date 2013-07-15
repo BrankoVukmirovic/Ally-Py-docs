@@ -3,7 +3,7 @@
 Creating a plugin
 =================
 
-In this guide We will create a simple plugin called ``sample_plugin`` with the structure described in :ref:`Structure`.
+In this guide we will create a simple plugin called ``sample_plugin`` with the structure described in :ref:`Structure`.
 
 Describing the API
 ------------------
@@ -25,7 +25,7 @@ Add the Ally.py egg to the python path.
 add to python path
         ``distribution/components/ally-api.1.0.egg``
 
-To make the class recognizable by the Ally.py framework, edit the previous code to import the Ally.py model, specify the attribute to use as a unique id by passing it as a keyed argument to the model decorator (this is required for all Ally.py models) and specify a domain (similar to a namespace).
+To make the class recognizable by the Ally.py framework, edit the previous code to import the Ally.py model, specify the attribute to use as a unique id by passing it as a keyed argument to the model decorator (this is required for all Ally.py models) and specify a domain (similar to a namespace) ``sample_plugin.api.user``.
 
 .. code-block:: python
 
@@ -41,7 +41,9 @@ To make the class recognizable by the Ally.py framework, edit the previous code 
 
 Without a domain, the model is accessible at `User <http://localhost/resources/User>`_ , but with domain set to 'Sample' the domain is accessible at `Sample/User <http://localhost/resources/Sample/User>`_.
 
-To reuse a domain definition in various modules or plugins, define a domained model decorator in the ``sample_plugin.api.__init__`` module::
+To reuse a domain definition in various modules or plugins, define a domained model decorator in the ``sample_plugin.api.__init__`` module:
+
+.. code-block:: python
 
    from functools import partial
    from ally.api.config import model
@@ -50,7 +52,9 @@ To reuse a domain definition in various modules or plugins, define a domained mo
 
    modelSample = partial(model, domain='Sample')
 
-And edit the decorated user model in ``sample_plugin.api.user``::
+And edit the decorated user model in ``sample_plugin.api.user``:
+
+.. code-block:: python
 
         from sample_plugin.api import modelSample
 
@@ -64,7 +68,6 @@ And edit the decorated user model in ``sample_plugin.api.user``::
                 Id = int
                 Name = str
         
-
 
 To complement the model, we need to add a service to deliver instances of the model as a REST response in ``sample_plugin.api.user``: 
 
@@ -116,9 +119,35 @@ After defining the API we can create an implementation based upon it, returning 
                 </User>
         </UserList>
 
-To achieve this, edit the user implementation in ``sample_plugin.impl.user`` ::
+To achieve this, edit the user implementation in ``sample_plugin.impl.user`` :
 
-        from sample_plugin.api.user import IUserService, User
+.. code-block:: python 
+
+	from sample_plugin.api.user import IUserService
+	from ally.container.ioc import injected
+	from ally.container.support import setup
+
+	# --------------------------------------------------------------------
+
+	@injected
+	@setup(IUserService, name='userService')
+	class UserService(IUserService):
+	    '''
+	    Implementation for @see: IUserService
+	    '''
+	    
+	    def getUsers(self):
+		'''
+		@see: IUserService.getUsers
+		'''
+		return []
+
+
+.. TODO:: 
+	[SW] A couple of diferences we need to cover here?
+
+.. 
+	from sample_plugin.api.user import IUserService, User
 
         # --------------------------------------------------------------------
 
@@ -138,8 +167,8 @@ To achieve this, edit the user implementation in ``sample_plugin.impl.user`` ::
                                 user.Name = 'User %s' % k
                                 users.append(user)
                         return users
-
-To return more than one user adjust the range. 
+.. 
+	To return more than one user adjust the range. 
 
 Creating the configuration
 --------------------------
@@ -149,6 +178,8 @@ After defining the API and the implementation of the API, use the dependency inj
 We have defined a setup function decorated with ``@ioc.entity`` that delivers the implementation instance of ``UserService`` for the ``IUserService`` api.  Because this function is decorated with the ioc.entity decorator it will be used as a entity source by the DI container. 
 
 The register method will register the user service implementation instance to be used exposed, please notice that the instance is obtained by invoking the DI entity function userService.
+
+``__plugin __.sample_plugin.service``:
 
 .. code-block:: python
 
@@ -188,7 +219,48 @@ Querying and Filtering
 
 To filter the list of users use ``@query`` as shown in ``objects.sample_plugin.api.user``:
 
+.. TODO:: 
+	[SW] Can we confirm this is in 'objects.' is incorrect, right? 
+
 .. code-block:: python
+
+	from ally.api.config import service, call, query
+	from ally.api.criteria import AsLikeOrdered
+	from ally.api.type import Iter
+	from sample_plugin.api import modelSample
+
+	# --------------------------------------------------------------------
+
+	@modelSample(id='Id')
+	class User:
+	    '''
+	    The user model.
+	    '''
+	    Id = int
+	    Name = str
+
+	# --------------------------------------------------------------------
+
+	@query(User)
+	class QUser:
+	    '''
+	    The user model query object.
+	    '''
+	    name = AsLikeOrdered
+
+	@service
+	class IUserService:
+	    '''
+	    The user service.
+	    '''
+	    
+	    @call
+	    def getUsers(self, q:QUser=None) -> Iter(User):
+		'''
+		Provides all the users.
+		'''
+
+..
 
         from ally.api.config import service, call, query
         from ally.api.criteria import AsLike
@@ -214,14 +286,6 @@ To filter the list of users use ``@query`` as shown in ``objects.sample_plugin.a
                 '''
                 name = AsLike
 
-        ...
-
-Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
-
-.. code-block:: python 
-
-        ...
-
         @service
         class IUserService:
                 '''
@@ -234,9 +298,52 @@ Query objects are like a models that contains data used for filtering. Queries h
                         Provides all the users.
                         '''
 
-The ``getUsers`` method now takes an query object instance as an optional parameter (with a default value of None). It is good practice to specify a default value for all query objects used in service methods, as queries are optional. 
+Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
+
+.. TODO::
+	[SW] Needs update above.
+
+The ``getUsers`` method now takes an query object instance as an optional parameter (with a default value of None). It is good practice to specify a default value for all query objects used in service methods, as queries are optional. In ``sample_plugin.impl.user``:
 
 .. code-block:: python 
+
+	from sample_plugin.api.user import IUserService, User, QUser
+	from ally.support.api.util_service import likeAsRegex
+	from ally.container.ioc import injected
+	from ally.container.support import setup
+
+	# --------------------------------------------------------------------
+
+	@injected
+	@setup(IUserService, name='userService')
+	class UserService(IUserService):
+	    '''
+	    Implementation for @see: IUserService
+	    '''
+	    
+	    def getUsers(self, q=None):
+		'''
+		@see: IUserService.getUsers
+		'''
+		users = []
+		for k in range(1, 10):
+		    user = User()
+		    user.Id = k
+		    user.Name = 'User %s' % k
+		    users.append(user)
+		    
+		if q:
+		    assert isinstance(q, QUser)
+		    if QUser.name.like in q:
+			nameRegex = likeAsRegex(q.name.like)
+			users = [user for user in users if nameRegex.match(user.Name)]
+		    if QUser.name.ascending in q:
+			users.sort(key=lambda user: user.Name, reverse=not q.name.ascending)
+		    
+		return users
+
+
+..
 
         from sample_plugin.api.user import IUserService, User, QUser
         from ally.support.api.util_service import likeAsRegex
