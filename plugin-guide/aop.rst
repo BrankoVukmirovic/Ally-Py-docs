@@ -3,22 +3,25 @@ Using Aspect-Oriented Programming
 
 Although dependency injection programming requires a lot of configuration code, the Ally.py framework reduces the need for plugin configuration by using Aspect-Oriented programming.
 
-Editing the example from :ref:`SQLAlchemy`, instead of manually writing the service instance function for UserService we will adapt conventions and use Aspect-Oriented programming to configure the plugin __plugin__.sample_plugin.service :
+Editing the example from :ref:`SQLAlchemy`, instead of manually writing the service instance function for UserService we will adapt conventions and use Aspect-Oriented programming to configure the plugin ``__plugin__.sample_plugin.service`` :
 
 .. code-block:: python
 
-        from __plugin__.plugin.registry import addService
-        from __plugin__.sample_plugin.db_sample import alchemySessionCreator
-        from ally.container import support
-        from ally.support.sqlalchemy.session import bindSession
-
-        # --------------------------------------------------------------------
-
-        API, IMPL = 'sample_plugin.api.**.I*Service', 'sample_plugin.impl.**.*'
-        support.createEntitySetup(API, IMPL)
-        def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
-        support.listenToEntities(IMPL, listeners=addService(bindSampleSession,))
-        support.loadAllEntities(API)
+	from __plugin__.plugin.registry import addService
+	from __plugin__.sample_plugin.db_sample import alchemySessionCreator
+	from ally.container import support
+	from ally.support.sqlalchemy.session import bindSession
+	
+	# --------------------------------------------------------------------
+	
+	API, IMPL = 'sample_plugin.api.**.I*Service', 'sample_plugin.impl.**.*'
+	
+	support.createEntitySetup(API, IMPL)
+	
+	def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
+	support.listenToEntities(IMPL, listeners=addService(bindSampleSession,))
+	
+	support.loadAllEntities(API)
 
 The variables ``API`` and ``IMPL`` contain the Aspect-Oriented signatures for the services:
 
