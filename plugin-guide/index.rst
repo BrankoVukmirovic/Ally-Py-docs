@@ -10,6 +10,7 @@ Contents:
    creating.rst
    sql_alchemy.rst
    aop.rst
+   advanced_sql_alchemy.rst
    models.rst
 
 
