@@ -3,45 +3,69 @@ Associating and Extending Models
 
 Associating two models implies that one model contains a reference to another model. This requires modifcation of that model's API and meta functions.
 
+.. TODO:: [SW] Not sure how the 00 plugin works with these last two plugin examples
+.. TODO:: [SW] Also, why example not sample, and why alter the directory structure, ie example/user/api 
+
 .. 
         The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, 
         
-To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``sample_plugin.api.user_type``:
+To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``example.user.api.user_type``:
 
 .. code-block:: python
 
-        '''
-        The API descriptions for user type sample.
-        '''
-        from ally.api.config import query, service
-        from ally.api.criteria import AsLike
-        from sample_plugin.api import modelSample
-        from sql_alchemy.api.entity import Entity, QEntity, IEntityService
-        # --------------------------------------------------------------------
-        @modelSample
-        class UserType(Entity):
-        '''
-        The user type model.
-        '''
-        Name = str
-        # --------------------------------------------------------------------
-        @query
-        class QUserType(QEntity):
-        '''
-        The user type model query object.
-        '''
-        name = AsLike
-        # --------------------------------------------------------------------
-        @service((Entity, UserType), (QEntity, QUserType))
-        class IUserTypeService(IEntityService):
-        '''
-        The user type service.
-        '''
+	from ally.api.config import query, service
+	from ally.api.criteria import AsLikeOrdered
+	from example.api.domain_example import modelExample
+	from ally.support.api.entity import Entity, QEntity, IEntityService
 
-The UserType API, is simiar to the User API. We also need to edit ``meta.sample_plugin.meta.user_type``:
+	# --------------------------------------------------------------------
+
+	@modelExample
+	class UserType(Entity):
+	    '''
+	    The user type model.
+	    '''
+	    Name = str
+
+	# --------------------------------------------------------------------
+
+	@query(UserType)
+	class QUserType(QEntity):
+	    '''
+	    The user type model query object.
+	    '''
+	    name = AsLikeOrdered
+
+	# --------------------------------------------------------------------
+
+	@service((Entity, UserType), (QEntity, QUserType))
+	class IUserTypeService(IEntityService):
+	    '''
+	    The user type service.
+	    '''
+
+The UserType API, is similar to the User API. We also need to edit ``example.user.meta.user_type``:
 
 .. code-block:: python
 
+	from example.user.api.user_type import UserType
+	from ally.support.sqlalchemy.mapper import validate
+	from sqlalchemy.dialects.mysql.base import INTEGER
+	from sqlalchemy.schema import Column
+	from sqlalchemy.types import String
+	from example.meta.metadata_example import Base
+
+	# --------------------------------------------------------------------
+
+	@validate
+	class UserTypeMapped(Base, UserType):
+	    __tablename__ = 'user_type'
+	    __table_args__ = dict(mysql_engine='InnoDB', mysql_charset='utf8')
+
+	    Id = Column('id', INTEGER(unsigned=True), primary_key=True)
+	    Name = Column('name', String(20), nullable=False, unique=True)
+
+..
         '''
         Mapping for the user type model.
         '''
@@ -59,10 +83,29 @@ The UserType API, is simiar to the User API. We also need to edit ``meta.sample_
 
 
 
-``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``sample_plugin.impl.user_type``:
+``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``example.user.impl.user_type``:
 
 .. code-block:: python
 
+	from example.user.api.user_type import IUserTypeService, QUserType
+	from example.user.meta.user_type import UserTypeMapped
+	from sql_alchemy.impl.entity import EntityServiceAlchemy
+	from ally.container.ioc import injected
+	from ally.container.support import setup
+
+	# --------------------------------------------------------------------
+
+	@injected
+	@setup(IUserTypeService, name='userTypeService')
+	class UserTypeServiceAlchemy(EntityServiceAlchemy, IUserTypeService):
+	    '''
+	    Implementation for @see: IUserTypeService
+	    '''
+
+	    def __init__(self):
+		EntityServiceAlchemy.__init__(self, UserTypeMapped, QUserType)
+
+..
         '''
         Simple implementation for the user type APIs.
         '''
@@ -78,31 +121,27 @@ The UserType API, is simiar to the User API. We also need to edit ``meta.sample_
         EntityServiceAlchemy.__init__(self, UserType, QUserType)
 
 
-After defining the UserType modules, start the application and the Aspect-Oriented configuration will automatically populate the REST services in `\Sample\UserType <http://localhost/resources/Sample/UserType>`_. This list is initially empty, so populate it with a POST request:
-
-method 
-        POST
+After defining the UserType modules, start the application and the Aspect-Oriented configuration will automatically populate the REST services in `\Sample\UserType <http://localhost/resources/Sample/UserType>`_. This list is initially empty, so populate it with a POST request to http://localhost/resources/Sample/UserType with the following headers:
 
 Accept
         xml
-
 Content-Type
         xml
-URL     
-        http://localhost/resources/Sample/UserType
-BODY
+Body
    .. code-block:: xml
 
            <UserType>
                    <Name>Administrator</Name>
            </UserType>
-RESPONSE
-   .. code-block:: xml
 
-           <?xml version="1.0" encoding="UTF-8"?>
-           <UserType href="http://localhost/resources/Sample/UserType/1">
-                   <Id>1</Id>
-           </UserType>
+Verify that the response is:
+
+.. code-block:: xml
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<UserType href="http://localhost/resources/Sample/UserType/1">
+		<Id>1</Id>
+	</UserType>
 
 If you try to resend the POST request you will receive the following response:
 
@@ -114,102 +153,112 @@ If you try to resend the POST request you will receive the following response:
                 <code>404</code>
         </error>
 
-The `name` is declared as unique, so the insertion request checks that the value is not already present in the database.
+`name` is declared as unique, so the insertion request checks that the value is not already present in the database.
 
-Editing the User model to reference the ``UserType`` model by changing the user API in ``sample_plugin.api.user``:
+Edit the User model to reference the ``UserType`` model by changing the user API in ``example.user.api.user``:
 
 .. code-block:: python
 
-        from ally.api.config import service, query
-        from ally.api.criteria import AsLike
-        from sample_plugin.api import modelSample
-        from sample_plugin.api.user_type import UserType
-        from sql_alchemy.api.entity import Entity, QEntity, IEntityService
+	from ally.api.config import service, query
+	from ally.api.criteria import AsLikeOrdered
+	from example.api.domain_example import modelExample
+	from example.user.api.user_type import UserType
+	from ally.support.api.entity import Entity, QEntity, IEntityService
 
-        # --------------------------------------------------------------------
+	# --------------------------------------------------------------------
 
-        @modelSample
-        class User(Entity):
-        '''
-        The user model.
-        '''
-        Name = str
-        Type = UserType
-        ...
+	@modelExample
+	class User(Entity):
+	    '''
+	    The user model.
+	    '''
+	    Name = str
+	    Type = UserType
+	...
 
 The new User model has an ``Type`` attribute with a value of ``UserType``, which the Ally.py framework detects as reference to an object. The actual value of ``Type`` is the model ``id`` of ``UserType``. 
 
-Modifying the meta class to include ``Type`` in ``sample_plugin.meta.user``:
+Modifying the meta class to include ``Type`` in ``example.user.meta.user``:
 
 .. code-block:: python
 
-        from ally.support.sqlalchemy.mapper import mapperModel
-        from sample_plugin.api.user import User
-        from sample_plugin.meta import meta
-        from sqlalchemy.schema import Table, Column, ForeignKey
-        from sqlalchemy.types import String, Integer
-        from sample_plugin.meta.user_type import UserType
-        # --------------------------------------------------------------------
-        table = Table('sample_user', meta,
-        Column('id', Integer, primary_key=True, key='Id'),
-        Column('name', String(20), nullable=False, key='Name'),
-        Column('fk_user_type', ForeignKey(UserType.Id, ondelete='RESTRICT'), nullable=False,
-        key='Type'))
-        # map User entity to defined table (above)
-        User = mapperModel(User, table)
+	from example.user.api.user import User
+	from example.user.meta.user_type import UserTypeMapped
+	from ally.support.sqlalchemy.mapper import validate
+	from sqlalchemy.dialects.mysql.base import INTEGER
+	from sqlalchemy.schema import Column, ForeignKey
+	from sqlalchemy.types import String
+	from example.meta.metadata_example import Base
 
-        
-We added a new column to the table that is a foreign key to the user type table, you notice that when we define relations with other models we
-always need to use the meta class, in this case the UserType mapped in the module sample_plugin.meta.user_type. Because the logic in the
-services is not modified by the newly added information we don't need to modify anything in the service APIs or implementations.
-In order to test this, before we start the application we need to delete the sample.db file in the distribution, this will force the creation of the new
-sample_user table that contains now also the user type foreign key, also to get a better error message that will also tell which attribute is the
-problem change the configuration explain_detailed_error to true in the "application.properties" file. Now lets insert a user, keep in mind that our
-database is empty.
+	# --------------------------------------------------------------------
 
-method 
-        POST
+	@validate
+	class UserMapped(Base, User):
+	    __tablename__ = 'user'
+	    __table_args__ = dict(mysql_engine='InnoDB', mysql_charset='utf8')
+
+	    Id = Column('id', INTEGER(unsigned=True), primary_key=True)
+	    Name = Column('name', String(20), nullable=False)
+	    Type = Column('fk_user_type', ForeignKey(UserTypeMapped.Id, ondelete='RESTRICT'), nullable=False)
+
+.. 
+	from ally.support.sqlalchemy.mapper import mapperModel
+	from sample_plugin.api.user import User
+	from sample_plugin.meta import meta
+	from sqlalchemy.schema import Table, Column, ForeignKey
+	from sqlalchemy.types import String, Integer
+	from sample_plugin.meta.user_type import UserType
+	# --------------------------------------------------------------------
+	table = Table('sample_user', meta,
+	Column('id', Integer, primary_key=True, key='Id'),
+	Column('name', String(20), nullable=False, key='Name'),
+	Column('fk_user_type', ForeignKey(UserType.Id, ondelete='RESTRICT'), nullable=False,
+	key='Type'))
+	# map User entity to defined table (above)
+	User = mapperModel(User, table)
+
+.. TODO:: I Don't understand all of this.  
+	We added a new column to the table that is a foreign key to the user type table, you notice that when we define relations with other models we always need to use the meta class, in this case the UserType mapped in the module sample_plugin.meta.user_type. Because the logic in the services is not modified by the newly added information we don't need to modify anything in the service APIs or implementations.  In order to test this, before we start the application we need to delete the sample.db file in the distribution, this will force the creation of the new sample_user table that contains now also the user type foreign key, also to get a better error message that will also tell which attribute is the problem change the configuration explain_detailed_error to true in the "application.properties" file. 
+
+Try to insert a user into the empty database by making a POST request to http://localhost/resources/Sample/User with the following headers:
+
 Accept
         xml
 Content-Type
         xml
-URL
-        http://localhost/resources/Sample/User
 BODY
    .. code-block:: xml
 
            <User>
                    <Name>John Doe</Name>
            </User>
-RESPONSE
-   .. code-block:: xml
 
-           <?xml version="1.0" encoding="UTF-8"?>
-           <error>
-                   <code>404</code>
-                   <User>
-                           <Type>Expected a value</Type>
-                   </User>
-           </error>
+And verify that response is 
 
-So we get an error of Invalid resource because the User.Type is not specified, that is because when we defined the table we set the nullable flag to false for the Type column. Since our database is empty lets insert a user type.
+.. code-block:: xml
 
-method
-        POST
+   <?xml version="1.0" encoding="UTF-8"?>
+   <error>
+	   <code>404</code>
+	   <User>
+		   <Type>Expected a value</Type>
+	   </User>
+   </error>
+
+The response is an error, because the request did not specify ``User.Type``, and it is defined as not nullable. Insert a ``User.Type`` into the empty database by making a POST request to http://localhost/resources/Sample/UserType with the following headers:
+
 Accept
         xml
 Content-Type
         xml
-URL
-        http://localhost/resources/Sample/UserType
+Body 
+	.. code-block:: xml
 
-.. code-block:: xml
+		<UserType>
+			<Name>John Doe</Name>
+		</UserType>
 
-        <UserType>
-                <Name>root</Name>
-        </UserType>
-
-RESPONSE:
+The response confirming insertion of a ``User.Type`` is:
 
 .. code-block:: xml
 
@@ -218,55 +267,21 @@ RESPONSE:
                 <Id>1</Id>
         </UserType>
 
-Now that we have user type of id 1 lets try to insert the user having this user type.
+Now that we have ``User.Type`` of id 1 we can insert a user of type 1 by making a POST request to http://localhost/resources/Sample/User with the following headers:
 
-method
-        POST
 Accept
         xml
 Content-Type
         xml
-URL
-        http://localhost/resources/Sample/User
+Body 
+	.. code-block:: xml
 
-.. code-block:: xml
+		<User>
+			<Name>John Doe</Name>
+			<Type>1</Type>
+		</User>
 
-        <User>
-                <Name>John Doe</Name>
-                <Type>2</Type>
-        </User>
-
-RESPONSE:
-
-.. code-block:: xml
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <error>
-                <code>404</code>
-                <User>
-                        <Type>Unknown foreign id</Type>
-                </User>
-        </error>
-
-I had intentionally set the type as 2 because there is no user type in the database with that id and as you see the binded validations will deliver a message telling us that the id we had specified is invalid. Lets to this again but with a valid id.
-
-method
-        POST
-Accept
-        xml
-Content-Type
-        xml
-URL
-        http://localhost/resources/Sample/User
-
-.. code-block:: xml
-
-        <User>
-                <Name>Jhon Doe</Name>
-                <Type>1</Type>
-        </User>
-
-RESPONSE:
+Note the confirmation response:
 
 .. code-block:: xml
 
@@ -275,7 +290,9 @@ RESPONSE:
                 <Id>1</Id>
         </User>
 
-Now we have successfully inserted a user in the database that also has a type, so now if you access http://localhost/resources/Sample/User/1
+If you make the same request using a ``User.Type=2`` the request fails, as validation tells us that there is only 1 ``User.Type`` in the database.
+
+Now we have successfully inserted a user with a user type into the database, so we can access http://localhost/resources/Sample/User/1 , and view the new user model with a user type reference. 
 
 .. code-block:: xml
 
@@ -285,44 +302,71 @@ Now we have successfully inserted a user in the database that also has a type, s
                         <Id>1</Id>
                 </Type>
                 <Id>1</Id>
-                <Name>Jhon Doe</Name>
+                <Name>John Doe</Name>
         </User>
 
-, you have the new user model with a user type reference. The sample code can be found here.
 
 Extending Models
 -------------------------------
 
-The extending is when a service provides models based on another model id, even if the provided models are not associated with the other
-model. The extending requires only the modification of the service's APIs and implementations.  sample_plugin.api.user
+Extending a model requires the service providing a model based on another model's id, but does not require the models to be associated with each other. This requires only the modification of the service API and implementation.
+
+Editing the API ``example.user.api.user``:
 
 .. code-block:: python
 
-        from ally.api.config import service, query, call
-        from ally.api.criteria import AsLike
-        from ally.api.type import Iter
-        from sample_plugin.api import modelSample
-        from sample_plugin.api.user_type import UserType
-        from sql_alchemy.api.entity import Entity, QEntity, IEntityService
-        ...
-        # --------------------------------------------------------------------
-        @service((Entity, User), (QEntity, QUser))
-        class IUserService(IEntityService):
-        '''
-        The user service.
-        '''
-        @call
-        def getUsersByType(self, typeId:UserType.Id, offset:int=None, limit:int=None,
-        q:QUser=None)->Iter(User):
-        '''
-        Provides the users that have the specified type id.
-        '''
+	from ally.api.config import service, query, call
+	from ally.api.criteria import AsLikeOrdered
+	from ally.api.type import Iter
+	from example.api.domain_example import modelExample
+	from example.user.api.user_type import UserType
+	from ally.support.api.entity import Entity, QEntity, IEntityService
 
-We added a service method that will deliver all the users that have the specified type id, also the service method will allow the specification of
-offset, limit and user query.sample_plugin.impl.user
+	...
+
+	@service((Entity, User), (QEntity, QUser))
+	class IUserService(IEntityService):
+	    '''
+	    The user service.
+	    '''
+
+	    @call
+	    def getUsersByType(self, typeId:UserType.Id, offset:int=None, limit:int=None, q:QUser=None) -> Iter(User):
+		'''
+		Provides the users that have the specified type id.
+		'''
+
+We added a service method that provides all users that have the specified user type. You can specify offset, limit and user.
+
+Editing the implementation ``example.user.impl.user``:
 
 .. code-block:: python
 
+	from example.user.api.user import IUserService, QUser
+	from example.user.meta.user import UserMapped
+	from sql_alchemy.impl.entity import EntityServiceAlchemy
+	from ally.container.ioc import injected
+	from ally.container.support import setup
+
+	# --------------------------------------------------------------------
+
+	@injected
+	@setup(IUserService, name='userService')
+	class UserServiceAlchemy(EntityServiceAlchemy, IUserService):
+	    '''
+	    Implementation for @see: IUserService
+	    '''
+
+	    def __init__(self):
+		EntityServiceAlchemy.__init__(self, UserMapped, QUser)
+
+	    def getUsersByType(self, typeId, offset=None, limit=None, q=None):
+		'''
+		@see: IUserService.getUsersByType
+		'''
+		return self._getAll(UserMapped.Type == typeId, q, offset, limit)
+
+..
         from sample_plugin.api.user import IUserService, QUser
         from sample_plugin.meta.user import User
         from sql_alchemy.impl.entity import EntityServiceAlchemy
@@ -339,17 +383,15 @@ offset, limit and user query.sample_plugin.impl.user
         '''
         return self._getAll(User.Type == typeId, q, offset, limit)
 
-The implementation is very easy because it makes use of the _getAll method inherited from EntitySupportAlchemy that allows for an easy get
-of models from database. So now we have a service method that provides user models based on a user type, if we access
-http://localhost/resources/Sample/UserType/1 we get:
+This implementation makes use of the ``_getAll`` method inherited from ``EntitySupportAlchemy`` that simplifies getting models from the database. So now we have a service method that provides user models based on a user type, if we access http://localhost/resources/Sample/UserType/1 we get:
 
 .. code-block:: xml
 
         <?xml version="1.0" encoding="UTF-8"?>
         <UserType>
                 <Id>1</Id>
-                <Name>root</Name>
+                <Name>John Doe</Name>
                 <User href="http://localhost/resources/Sample/UserType/1/User/"/>
         </UserType>
 
-Now, beside the UserType model data we also have a new reference for the User models that belong to this UserType, this reference will call our new service method. The idea is that we are able to add information on existing models like UserType from a different service than the main main user type service.
+As well as the ``UserType`` model data, we also have a reference to the User models that belong to the ``UserType`` that calls the service method. In this way other services can add information to the ``UserType`` model without using the main user type service.
