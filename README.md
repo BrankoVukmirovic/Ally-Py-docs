@@ -3,16 +3,21 @@ Ally-Py-docs
 
 This is the repository holding all documentation related to the Ally-Py framework.
 
-You will find here different documents as they are produced: Reference, Plugin Guide, HowTos, etc. The way the
-different documents are organized is simple, each directory corresponds to a document. For example, the
-*plugin-guide* directory holds the Plugin Guide, and so on.
+It will contain various documents, each in a separate directory:
 
-Documentation is written using [Sphinx](http://sphinx-doc.org/), if you want to render it in your Web browser
-as HTML pages you can easily do it by:
+* Reference (not yet available)
+* Plugin Guide (in `plugin_guide` directory)
+* Howto (not yet available)
 
-1. Make sure to have Sphinx [installed](http://sphinx-doc.org/install.html)
-2. Clone this repository.
-3. Run the following in the command line: `$ sphinx-build -b html plugin-guide <target directory>`. Then you will see all generated *Plugin Guide* pages in HTML format within the target directory.
-4. Go to your browser and open the index.html page.
+Documentation is generated using [Sphinx](http://sphinx-doc.org/), and written in [reStructuredTex](http://sphinx-doc.org/rest.html).
+
+To generate an HTML version of the documentation: 
+
+1. Install [Sphinx](http://sphinx-doc.org/install.html).
+2. Clone this repository `git clone git@github.com:sourcefabric/Ally-Py-docs.git`.
+3. To generate the html version of the Plugin Guide, run `make html` from inside the `plugin_guide` directory.
+4. Go to your browser and open `plugin_guide/_build/html/index.html`.
 
 Enjoy reading !
+
+You can also generate a PDF version if you install LaTeX or rst2pdf.
