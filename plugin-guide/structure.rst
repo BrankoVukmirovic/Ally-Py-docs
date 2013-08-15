@@ -6,7 +6,7 @@ Plugin structure
 All plugins have the same intial file structure:
 
 * ``plugin`` # the setup package
-   + ``_init_.py`` # the init module of the package
+   + ``__init__.py`` # the init module of the package
    + ``sample_plugin`` # the unique configuration package
       - ``__init__.py``
 * ``sample_plugin`` # the main package

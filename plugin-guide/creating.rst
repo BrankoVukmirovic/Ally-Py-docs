@@ -173,13 +173,13 @@ To achieve this, edit the user implementation in ``sample_plugin.impl.user`` :
 Creating the configuration
 --------------------------
 
-After defining the API and the implementation of the API, use the dependency injection container to expose the API through the HTTP REST interface of the Ally.py framework. Create the module ``service`` in package ``__plugin __.sample_plugin.service`` 
+After defining the API and the implementation of the API, use the dependency injection container to expose the API through the HTTP REST interface of the Ally.py framework. Create the module ``service`` in package ``__plugin__.sample_plugin.service`` 
 
 We have defined a setup function decorated with ``@ioc.entity`` that delivers the implementation instance of ``UserService`` for the ``IUserService`` api.  Because this function is decorated with the ioc.entity decorator it will be used as a entity source by the DI container. 
 
 The register method will register the user service implementation instance to be used exposed, please notice that the instance is obtained by invoking the DI entity function userService.
 
-``__plugin __.sample_plugin.service``:
+``__plugin__.sample_plugin.service``:
 
 .. code-block:: python
 
