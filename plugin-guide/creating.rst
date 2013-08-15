@@ -260,44 +260,6 @@ To filter the list of users use ``@query`` as shown in ``objects.sample_plugin.a
 		Provides all the users.
 		'''
 
-..
-
-        from ally.api.config import service, call, query
-        from ally.api.criteria import AsLike
-        from ally.api.type import Iter
-        from sample_plugin.api import modelSample
-
-        # --------------------------------------------------------------------
-
-        @modelSample(id='Id')
-        class User:
-                '''
-                The user model.
-                '''
-                Id = int
-                Name = str
-
-        # --------------------------------------------------------------------
-
-        @query
-        class QUser:
-                '''
-                The user model query object.
-                '''
-                name = AsLike
-
-        @service
-        class IUserService:
-                '''
-                The user service.
-                '''
-
-                @call
-                def getUsers(self, q:QUser=None) -> Iter(User):
-                        '''
-                        Provides all the users.
-                        '''
-
 Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
 
 .. TODO::
@@ -342,39 +304,6 @@ The ``getUsers`` method now takes an query object instance as an optional parame
 		    
 		return users
 
-
-..
-
-        from sample_plugin.api.user import IUserService, User, QUser
-        from ally.support.api.util_service import likeAsRegex
-
-        # --------------------------------------------------------------------
-
-        class UserService(IUserService):
-                '''
-                Implementation for @see: IUserService
-                '''
-
-                def getUsers(self, q=None):
-                        '''
-                        @see: IUserService.getUsers
-                        '''
-                        users = []
-                        for k in range(1, 10):
-                                user = User()
-                                user.Id = k
-                                user.Name = 'User %s' % k
-                                users.append(user)
-
-                        if q:
-                                assert isinstance(q, QUser)
-                                if QUser.name.like in q:
-                                        nameRegex = likeAsRegex(q.name.like)
-                                        users = [user for user in users if nameRegex.match(user.Name)]
-                                if QUser.name.ascending in q:
-                                        users.sort(key=lambda user: user.Name, reverse=not q.name.ascending)
-
-                        return users
 
 
 ``getUsers`` now returns 10 users, and checks if query object exists. If a query object exists and has a specified like value in the name criteria, we generate a regular expression and filter the user list accordingly. If the ascending flag exists, we sort the user list in ascending order. 
