@@ -8,7 +8,7 @@ Continuing the example from :ref:`Creating`, we will make user model persistant 
 add to python path
         ``distribution/libraries/SQLAlchemy-0.7.1-py3.2.egg``
 
-Then to use SQLAlchemy we define a ``MetaData`` object in ``sample_plugin.meta.__init__`` that is used to create the table:
+Then to use SQLAlchemy we define a ``MetaData`` object in ``sample_plugin.meta.__init__.py`` that is used to create the table:
 
 .. code-block:: python
 
@@ -25,7 +25,7 @@ Add the Ally.py SQLAlchemy egg to the Python path
 add to python path
         ``distribution/components/ally-core-sqlalchemy.1.0.egg``
 
-Create a user module in ``sample_plugin.meta.user`` to map the User model to a database table: 
+Create a user module in ``sample_plugin.meta.user.py`` to map the User model to a database table: 
 
 
 .. code-block:: python
@@ -61,7 +61,7 @@ To add session support to the service implementation, extend ``SessionSupport``,
 
 .. NOTE:: If you implement the ``__init__`` method, you must call call the ``SessionSupport.__init__`` within your implementation.
 
-We now have a mapped User model class that we can use in our implementation, you need to use the ``User`` class from ``sample_plugin.meta`` to use SQLAlchemy. The next step is to edit the ``getUsers`` implementation in ``sample_plugin.impl.user`` to query ``User`` information from the database. 
+We now have a mapped User model class that we can use in our implementation, you need to use the ``User`` class from ``sample_plugin.meta`` to use SQLAlchemy. The next step is to edit the ``getUsers`` implementation in ``sample_plugin.impl.user.py`` to query ``User`` information from the database. 
 
 .. code-block:: python
    
@@ -84,53 +84,61 @@ We now have a mapped User model class that we can use in our implementation, you
 
 .. TODO:: [SW] Need to check this code block, code is very different
 
-A database query to an empty database is not of much use, we need to add a method to the ``IUserService`` class in ``sample_plugin.api.user``, and then write the service implementation to populate the database in ``sample_plugin.impl.user``.
+A database query to an empty database is not of much use, we need to add a method to the ``IUserService`` class in ``sample_plugin.api.user.py``, and then write the service implementation to populate the database in ``sample_plugin.impl.user.py``.
 
-``sample_plugin.api.user``:
+``sample_plugin.api.user.py``:
 
 .. code-block:: python
-   
-        from sample_plugin.api.user import IUserService
-        from ally.support.sqlalchemy.session import SessionSupport
-        from sample_plugin.meta.user import User
 
-        # --------------------------------------------------------------------
+	from sample_plugin.api.user import IUserService
+	from ally.support.sqlalchemy.session import SessionSupport
+	from ally.container.ioc import injected
+	from ally.container.support import setup
+	from sample_plugin.meta.user import User
+	from sqlalchemy.exc import SQLAlchemyError
+	import logging
 
-        class UserService(IUserService, SessionSupport):
-        '''
-        Implementation for @see: IUserService
-        '''
+	# --------------------------------------------------------------------
 
-        def getUsers(self):
-                '''
-                @see: IUserService.getUsers
-                '''
-                return self.session().query(User).all()
+	log = logging.getLogger(__name__)
 
-        @service
-        class IUserService:
-                '''
-                The user service.
-                '''
-                ...
-                @call
-                def insert(self, user:User) -> User.Id:
-                        '''
-                        Persist the user model.
-                        '''
+	# --------------------------------------------------------------------
 
-.. TODO:: [SW] Need to check this code block, code is very different
-                        
+	@injected
+	@setup(IUserService, name='userService')
+	class UserService(IUserService, SessionSupport):
+	    '''
+	    Implementation for @see: IUserService
+	    '''
+	    
+	    def getUsers(self):
+		'''
+		@see: IUserService.getUsers
+		'''
+		return self.session().query(User).all()
+		
+	    def insert(self, user):
+		'''
+		@see: IUserService.insert
+		'''
+		mapped = User()
+		if User.Name in user: mapped.Name = user.Name
+		try:
+		    self.session().add(mapped)
+		    self.session().flush((mapped,))
+		except SQLAlchemyError:
+		    log.exception('Could not insert %s' % user)
+
 The ``insert`` method handles the insertion of the user model, and is annotated with the input and output types. The input is a user model object and the output is the user id.
 
-When implementing the insert method in ``sample_plugin.impl.user`` we need to convert the user model from ``sample_plugin.api.user`` to the user model in ``sample_plugin.meta.user`` which SQLAlchemy understands, in ``sample_plugin.impl.user``:
+When implementing the insert method in ``sample_plugin.impl.user.py`` we need to convert the user model from ``sample_plugin.api.user.py`` to the user model in ``sample_plugin.meta.user.py`` which SQLAlchemy understands, in ``sample_plugin.impl.user.py``:
 
 .. code-block:: python
 
         mapped = User()
 	if User.Name in user: mapped.Name = user.Name
 
-The following code, ``sample_plugin.impl.user``, checks if the ``User.Name`` attribute is specified for the user instance, and if it is, sets it on the corresponding mapped object. To insert the mapped User object into the database, add it to the session, and flush the session to get the inserted users Id. 
+The following code in ``sample_plugin.impl.user.py``, checks if the ``User.Name`` attribute is specified for the user instance, and if it is, sets it on the corresponding mapped object. To insert the mapped User object into the database, add it to the session, and flush the session to get the inserted users Id. 
 
 .. code-block:: python
 
@@ -202,7 +210,7 @@ We can add users to the database, and query the database for existing users, but
 
 The ``createTables()`` setup function creates tables in the database. When the application starts, all tables defined in meta that do not already exist are created.
 
-Define the database setup module in ``__plugin__.sample_plugin.db_sample``:
+Define the database setup module in ``__plugin__.sample_plugin.db_sample.py``:
 
 .. code-block:: python
 
@@ -242,7 +250,7 @@ To prevent multiple methods using the same session, we need to wrap the service 
 
 .. TODO:: [SW] Not really sure why wrapping this in a proxy fixes the problem.
  
-Editing the configuration module in ``__plugin__.sample_plugin.service``:
+Editing the configuration module in ``__plugin__.sample_plugin.service.py``:
 
 .. code-block:: python
 
@@ -269,14 +277,12 @@ Editing the configuration module in ``__plugin__.sample_plugin.service``:
 
 Instead of returning the instance of UserService directly, a proxy containing all the of the methods definied in the API service interface ``IuserService`` is returned. The proxy delegates calls to the actual user service implementation and handles the session management for all the methods.
         
-Now when you run the application you will see ``sample.db`` inside the distribution folder. If you access `resources/Sample/User <http://localhost/resources/Sample/User>`_ the response is an empty list, because there are no user in the database.
+Now when you run the application you see ``sample.db`` inside the distribution folder. If you access `resources/Sample/User <http://localhost/resources/Sample/User>`_ the response is an empty list, because there are no user in the database.
 
 Querying the Database
 -------------------------------- 
 
-When querying users from a database you cannot know how many users the response will contain, so to avoid huge responses we need to implement an offset and limit for the query in ``sample_plugin.api.user``: 
-
-.. [SW] in API, NOT in IMPL, correct? WAS ``sample_plugin.impl.user``:
+When querying users from a database you cannot know how many users the response will contain, so to avoid huge responses we need to implement an offset and limit for the query in ``sample_plugin.api.user.py``: 
 
 .. code-block:: python
 
@@ -324,7 +330,7 @@ When querying users from a database you cannot know how many users the response 
 		Persist the user model.
 		'''
 
-We added offset and limit attributes of type integer to the ``getUsers`` method. The Ally.py framework automatically handles free parameters as long as they have a default value and are of a primitive type. Adjusting ``sample_plugin.impl.user``:
+We added offset and limit attributes of type integer to the ``getUsers`` method. The Ally.py framework automatically handles free parameters as long as they have a default value and are of a primitive type. Adjusting ``sample_plugin.impl.user.py``:
 
 .. code-block:: python
 
@@ -381,5 +387,3 @@ We added offset and limit attributes of type integer to the ``getUsers`` method.
 Because the ``getUsers`` implementation method has a default value for ``limit`` of None instead of 10, whenever ``getUsers`` is called from an external request the limit of 10 is used, whenever ``getUsers`` is called from an internal request the None limit is used. 
 
 Provide the limit and offset as parameters in the URL `User?offset=1&limit=1 <http://localhost/resources/Sample/User?offset=1&limit=1>`_. Download the `example egg <https://github.com/sourcefabric/Ally-Py-docs/blob/master/plugin-guide/source_code/03_-_query_sql_alchemy_plugin_sample/sample_plugin-1.0.dev-py3.2.egg>`_
-
-

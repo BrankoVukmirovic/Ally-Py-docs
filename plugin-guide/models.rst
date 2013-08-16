@@ -9,7 +9,7 @@ Associating two models implies that one model contains a reference to another mo
 .. 
         The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, 
         
-To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``example.user.api.user_type``:
+To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``example.user.api.user_type.py``:
 
 .. code-block:: python
 
@@ -44,7 +44,7 @@ To associate a UserType model to the User model we need to create an API and imp
 	    The user type service.
 	    '''
 
-The UserType API, is similar to the User API. We also need to edit ``example.user.meta.user_type``:
+The UserType API, is similar to the User API. We also need to edit ``example.user.meta.user_type.py``:
 
 .. code-block:: python
 
@@ -65,25 +65,7 @@ The UserType API, is similar to the User API. We also need to edit ``example.use
 	    Id = Column('id', INTEGER(unsigned=True), primary_key=True)
 	    Name = Column('name', String(20), nullable=False, unique=True)
 
-..
-        '''
-        Mapping for the user type model.
-        '''
-        from ally.support.sqlalchemy.mapper import mapperModel
-        from sample_plugin.api.user_type import UserType
-        from sample_plugin.meta import meta
-        from sqlalchemy.schema import Table, Column
-        from sqlalchemy.types import String, Integer
-        # --------------------------------------------------------------------
-        table = Table('sample_user_type', meta,
-        Column('id', Integer, primary_key=True, key='Id'),
-        Column('name', String(20), nullable=False, unique=True, key='Name'))
-        # map User Type entity to defined table (above)
-        UserType = mapperModel(UserType, table)
-
-
-
-``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``example.user.impl.user_type``:
+``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``example.user.impl.user_type.py``:
 
 .. code-block:: python
 
@@ -104,22 +86,6 @@ The UserType API, is similar to the User API. We also need to edit ``example.use
 
 	    def __init__(self):
 		EntityServiceAlchemy.__init__(self, UserTypeMapped, QUserType)
-
-..
-        '''
-        Simple implementation for the user type APIs.
-        '''
-        from sample_plugin.api.user_type import IUserTypeService, QUserType
-        from sample_plugin.meta.user_type import UserType
-        from sql_alchemy.impl.entity import EntityServiceAlchemy
-        # --------------------------------------------------------------------
-        class UserTypeService(EntityServiceAlchemy, IUserTypeService):
-        '''
-        Implementation for @see: IUserTypeService
-        '''
-        def __init__(self):
-        EntityServiceAlchemy.__init__(self, UserType, QUserType)
-
 
 After defining the UserType modules, start the application and the Aspect-Oriented configuration will automatically populate the REST services in `\Sample\UserType <http://localhost/resources/Sample/UserType>`_. This list is initially empty, so populate it with a POST request to http://localhost/resources/Sample/UserType with the following headers:
 
@@ -155,7 +121,7 @@ If you try to resend the POST request you will receive the following response:
 
 `name` is declared as unique, so the insertion request checks that the value is not already present in the database.
 
-Edit the User model to reference the ``UserType`` model by changing the user API in ``example.user.api.user``:
+Edit the User model to reference the ``UserType`` model by changing the user API in ``example.user.api.user.py``:
 
 .. code-block:: python
 
@@ -178,7 +144,7 @@ Edit the User model to reference the ``UserType`` model by changing the user API
 
 The new User model has an ``Type`` attribute with a value of ``UserType``, which the Ally.py framework detects as reference to an object. The actual value of ``Type`` is the model ``id`` of ``UserType``. 
 
-Modifying the meta class to include ``Type`` in ``example.user.meta.user``:
+Modifying the meta class to include ``Type`` in ``example.user.meta.user.py``:
 
 .. code-block:: python
 
@@ -311,7 +277,7 @@ Extending Models
 
 Extending a model requires the service providing a model based on another model's id, but does not require the models to be associated with each other. This requires only the modification of the service API and implementation.
 
-Editing the API ``example.user.api.user``:
+Editing the API ``example.user.api.user.py``:
 
 .. code-block:: python
 
@@ -338,7 +304,7 @@ Editing the API ``example.user.api.user``:
 
 We added a service method that provides all users that have the specified user type. You can specify offset, limit and user.
 
-Editing the implementation ``example.user.impl.user``:
+Editing the implementation ``example.user.impl.user.py``:
 
 .. code-block:: python
 
@@ -365,23 +331,6 @@ Editing the implementation ``example.user.impl.user``:
 		@see: IUserService.getUsersByType
 		'''
 		return self._getAll(UserMapped.Type == typeId, q, offset, limit)
-
-..
-        from sample_plugin.api.user import IUserService, QUser
-        from sample_plugin.meta.user import User
-        from sql_alchemy.impl.entity import EntityServiceAlchemy
-        # --------------------------------------------------------------------
-        class UserService(EntityServiceAlchemy, IUserService):
-        '''
-        Implementation for @see: IUserService
-        '''
-        def __init__(self):
-        EntityServiceAlchemy.__init__(self, User, QUser)
-        def getUsersByType(self, typeId, offset=None, limit=None, q=None):
-        '''
-        @see: IUserService.getUsersByType
-        '''
-        return self._getAll(User.Type == typeId, q, offset, limit)
 
 This implementation makes use of the ``_getAll`` method inherited from ``EntitySupportAlchemy`` that simplifies getting models from the database. So now we have a service method that provides user models based on a user type, if we access http://localhost/resources/Sample/UserType/1 we get:
 
