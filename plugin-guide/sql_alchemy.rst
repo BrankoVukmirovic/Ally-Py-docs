@@ -3,6 +3,8 @@
 Using SQLAlchemy
 =================
 
+..  Example 03_-_using_sql_alchemy_plugin_sample
+
 Continuing the example from :ref:`Creating`, we will make user model persistant by storing it in a database. We need to add the SQLAlchemy egg to the python path. 
 
 add to python path
@@ -63,6 +65,8 @@ To add session support to the service implementation, extend ``SessionSupport``,
 
 We now have a mapped User model class that we can use in our implementation, you need to use the ``User`` class from ``sample_plugin.meta`` to use SQLAlchemy. The next step is to edit the ``getUsers`` implementation in ``sample_plugin.impl.user.py`` to query ``User`` information from the database. 
 
+A database query to an empty database is not of much use, we need to add a method to the ``IUserService`` class in ``sample_plugin.api.user.py``:
+ 
 .. code-block:: python
    
         from sample_plugin.api.user import IUserService
@@ -82,20 +86,18 @@ We now have a mapped User model class that we can use in our implementation, you
                 '''
                 return self.session().query(User).all()
 
-.. TODO:: [SW] Need to check this code block, code is very different
-
-A database query to an empty database is not of much use, we need to add a method to the ``IUserService`` class in ``sample_plugin.api.user.py``, and then write the service implementation to populate the database in ``sample_plugin.impl.user.py``.
-
-``sample_plugin.api.user.py``:
+and then write the service implementation to populate the database in ``sample_plugin.impl.user.py``.
 
 .. code-block:: python
 
-	from sample_plugin.api.user import IUserService
 	from ally.support.sqlalchemy.session import SessionSupport
+	from sample_plugin.api.user import IUserService, QUser
+	from sample_plugin.meta.user import User
 	from ally.container.ioc import injected
 	from ally.container.support import setup
-	from sample_plugin.meta.user import User
 	from sqlalchemy.exc import SQLAlchemyError
+	from sqlalchemy.sql.expression import desc
+	from sqlalchemy.sql.operators import like_op
 	import logging
 
 	# --------------------------------------------------------------------
@@ -111,11 +113,19 @@ A database query to an empty database is not of much use, we need to add a metho
 	    Implementation for @see: IUserService
 	    '''
 	    
-	    def getUsers(self):
+	    def getUsers(self, offset=None, limit=None, q=None):
 		'''
 		@see: IUserService.getUsers
 		'''
-		return self.session().query(User).all()
+		sql = self.session().query(User)
+		if q:
+		    if QUser.name.like in q:
+			sql = sql.filter(like_op(User.Name, q.name.like))
+		    if QUser.name.ascending in q:
+			sql = sql.order_by(User.Name if q.name.ascending else desc(User.Name))
+		if offset: sql = sql.offset(offset)
+		if limit: sql = sql.limit(limit)
+		return sql.all()
 		
 	    def insert(self, user):
 		'''
@@ -128,6 +138,7 @@ A database query to an empty database is not of much use, we need to add a metho
 		    self.session().flush((mapped,))
 		except SQLAlchemyError:
 		    log.exception('Could not insert %s' % user)
+		return mapped.Id
 
 The ``insert`` method handles the insertion of the user model, and is annotated with the input and output types. The input is a user model object and the output is the user id.
 
@@ -246,11 +257,10 @@ Define the database setup module in ``__plugin__.sample_plugin.db_sample.py``:
 
 Sessions are created using the session creator whenever a service API method is invoked. After the method has been invoked the session is closed, either with a commit (when no exception has occurred) or with a rollback (if an exception has occured).
 
-To prevent multiple methods using the same session, we need to wrap the service implementionation in a proxy.
+To prevent multiple methods using the same session, we need to wrap the service implementionation in a proxy in ``__plugin__.sample_plugin.service.py``:
 
 .. TODO:: [SW] Not really sure why wrapping this in a proxy fixes the problem.
  
-Editing the configuration module in ``__plugin__.sample_plugin.service.py``:
 
 .. code-block:: python
 

@@ -17,5 +17,3 @@ Contents:
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-
-
