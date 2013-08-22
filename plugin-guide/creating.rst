@@ -12,12 +12,12 @@ The first example is based on a model of a user, with a name and an id number.  
 
 .. code-block:: python
 
-        class User:
-                '''
-                The user model.
-                '''
-                Id = int
-                Name = str
+    class User:
+        '''
+        The user model.
+        '''
+        Id = int
+        Name = str
 
 
 Add the Ally.py egg to the python path.               
@@ -56,49 +56,49 @@ And edit the decorated user model in ``sample_plugin.api.user.py``:
 
 .. code-block:: python
 
-        from sample_plugin.api import modelSample
+    from sample_plugin.api import modelSample
 
-        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-        @modelSample(id='Id')
-        class User:
-                '''
-                The user model.
-                '''
-                Id = int
-                Name = str
+    @modelSample(id='Id')
+    class User:
+        '''
+        The user model.
+        '''
+        Id = int
+        Name = str
         
 
 To complement the model, we need to add a service to deliver instances of the model as a REST response in ``sample_plugin.api.user.py``: 
 
 .. code-block:: python
 
-        from ally.api.config import service, call
-        from ally.api.type import Iter
-        from sample_plugin.api import modelSample
+    from ally.api.config import service, call
+    from ally.api.type import Iter
+    from sample_plugin.api import modelSample
 
-        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-        @modelSample(id='Id')
-        class User:
-                '''
-                The user model.
-                '''
-                Id = int
-                Name = str
+    @modelSample(id='Id')
+    class User:
+        '''
+        The user mode
+        '''
+        Id = int
+        Name = str
 
-        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-        @service
-        class IUserService:
-                '''
-                The user service.
-                '''
-                @call
-                def getUsers(self) -> Iter(User):
-                        '''
-                        Provides all the users.
-                        '''
+    @service
+    class IUserService:
+        '''
+        The user service.
+        '''
+        @call
+        def getUsers(self) -> Iter(User):
+            '''
+            Provides all the users.
+            '''
 
 All service interface names start with a capital 'I' followed by the service name and ending in 'Service' and are decorated with ``@service``. This convention simplifies Ally.py inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annoted with the return type. In the previous example, the return type is an interable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
 
@@ -112,35 +112,35 @@ After defining the API we can create an implementation based upon it, returning 
 
 .. code-block:: xml
 
-        <UserList>
-                <User>
-                        <Name>User 1</Name>
-                        <Id>1</Id>
-                </User>
-        </UserList>
+    <UserList>
+        <User>
+            <Name>User 1</Name>
+            <Id>1</Id>
+        </User>
+    </UserList>
 
 To achieve this, edit the user implementation in ``sample_plugin.impl.user.py`` :
 
 .. code-block:: python 
 
-	from sample_plugin.api.user import IUserService
-	from ally.container.ioc import injected
-	from ally.container.support import setup
+    from sample_plugin.api.user import IUserService
+    from ally.container.ioc import injected
+    from ally.container.support import setup
 
-	# --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-	@injected
-	@setup(IUserService, name='userService')
-	class UserService(IUserService):
-	    '''
-	    Implementation for @see: IUserService
-	    '''
-	    
-	    def getUsers(self):
-		'''
-		@see: IUserService.getUsers
-		'''
-		return []
+    @injected
+    @setup(IUserService, name='userService')
+    class UserService(IUserService):
+        '''
+        Implementation for @see: IUserService
+        '''
+        
+        def getUsers(self):
+    	'''
+    	@see: IUserService.getUsers
+    	'''
+    	return []
 
 Creating the configuration
 --------------------------
@@ -157,21 +157,21 @@ The ``register`` method registers the user service implementation instance which
 
 .. code-block:: python
 
-        from __plugin__.plugin.registry import registerService
-        from ally.container import ioc
-        from sample_plugin.api.user import IUserService
-        from sample_plugin.impl.user import UserService
+    from __plugin__.plugin.registry import registerService
+    from ally.container import ioc
+    from sample_plugin.api.user import IUserService
+    from sample_plugin.impl.user import UserService
 
-        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-        @ioc.entity
-        def userService() -> IUserService:
-                b = UserService()
-                return b
+    @ioc.entity
+    def userService() -> IUserService:
+        b = UserService()
+        return b
 
-        @ioc.start
-        def register():
-                registerService(userService())
+    @ioc.start
+    def register():
+        registerService(userService())
 
 
 Packaging and Deploying
@@ -183,10 +183,10 @@ The ant script creates ``02 - plugin sample.1.0.egg`` in the plugin ``source`` f
 
 .. code-block:: xml
 
-        <Resources>
-                <SampleUser href="http://localhost/resources/Sample/User/" />
-                ...
-        </Resources>
+    <Resources>
+        <SampleUser href="http://localhost/resources/Sample/User/" />
+        ...
+    </Resources>
 
 Querying and Filtering
 ------------------------
@@ -195,87 +195,85 @@ To filter the list of users use ``@query`` as shown in ``sample_plugin.api.user.
 
 .. code-block:: python
 
-	from ally.api.config import service, call, query
-	from ally.api.criteria import AsLikeOrdered
-	from ally.api.type import Iter
-	from sample_plugin.api import modelSample
+    from ally.api.config import service, call, query
+    from ally.api.criteria import AsLikeOrdered
+    from ally.api.type import Iter
+    from sample_plugin.api import modelSample
 
-	# --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-	@modelSample(id='Id')
-	class User:
-	    '''
-	    The user model.
-	    '''
-	    Id = int
-	    Name = str
+    @modelSample(id='Id')
+    class User:
+        '''
+        The user model.
+        '''
+        Id = int
+        Name = str
 
-	# --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-	@query(User)
-	class QUser:
-	    '''
-	    The user model query object.
-	    '''
-	    name = AsLikeOrdered
+    @query(User)
+    class QUser:
+        '''
+        The user model query object.
+        '''
+        name = AsLikeOrdered
 
-	@service
-	class IUserService:
-	    '''
-	    The user service.
-	    '''
-	    
-	    @call
-	    def getUsers(self, q:QUser=None) -> Iter(User):
-		'''
-		Provides all the users.
-		'''
+    @service
+    class IUserService:
+        '''
+        The user service.
+        '''
+        
+        @call
+        def getUsers(self, q:QUser=None) -> Iter(User):
+    	'''
+    	Provides all the users.
+    	'''
 
 Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
 
 .. TODO::
-	[SW] Needs update above.
+    [SW] Needs update above.
 
 The ``getUsers`` method now takes an query object instance as an optional parameter (with a default value of None). It is good practice to specify a default value for all query objects used in service methods, as queries are optional. In ``sample_plugin.impl.user.py``:
 
 .. code-block:: python 
 
-	from sample_plugin.api.user import IUserService, User, QUser
-	from ally.support.api.util_service import likeAsRegex
-	from ally.container.ioc import injected
-	from ally.container.support import setup
+    from sample_plugin.api.user import IUserService, User, QUser
+    from ally.support.api.util_service import likeAsRegex
+    from ally.container.ioc import injected
+    from ally.container.support import setup
 
-	# --------------------------------------------------------------------
+    # --------------------------------------------------------------------
 
-	@injected
-	@setup(IUserService, name='userService')
-	class UserService(IUserService):
-	    '''
-	    Implementation for @see: IUserService
-	    '''
-	    
-	    def getUsers(self, q=None):
-		'''
-		@see: IUserService.getUsers
-		'''
-		users = []
-		for k in range(1, 10):
-		    user = User()
-		    user.Id = k
-		    user.Name = 'User %s' % k
-		    users.append(user)
-		    
-		if q:
-		    assert isinstance(q, QUser)
-		    if QUser.name.like in q:
-			nameRegex = likeAsRegex(q.name.like)
-			users = [user for user in users if nameRegex.match(user.Name)]
-		    if QUser.name.ascending in q:
-			users.sort(key=lambda user: user.Name, reverse=not q.name.ascending)
-		    
-		return users
-
-
+    @injected
+    @setup(IUserService, name='userService')
+    class UserService(IUserService):
+        '''
+        Implementation for @see: IUserService
+        '''
+        
+        def getUsers(self, q=None):
+    	'''
+    	@see: IUserService.getUsers
+    	'''
+    	users = []
+    	for k in range(1, 10):
+    	    user = User()
+    	    user.Id = k
+    	    user.Name = 'User %s' % k
+    	    users.append(user)
+    	    
+    	if q:
+    	    assert isinstance(q, QUser)
+    	    if QUser.name.like in q:
+    		nameRegex = likeAsRegex(q.name.like)
+    		users = [user for user in users if nameRegex.match(user.Name)]
+    	    if QUser.name.ascending in q:
+    		users.sort(key=lambda user: user.Name, reverse=not q.name.ascending)
+    	    
+    	return users
 
 ``getUsers`` now returns 10 users, and checks if query object exists. If a query object exists and has a specified like value in the name criteria, we generate a regular expression and filter the user list accordingly. If the ascending flag exists, we sort the user list in ascending order. 
 

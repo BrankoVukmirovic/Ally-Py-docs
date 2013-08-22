@@ -9,21 +9,21 @@ Editing the example from :ref:`SQLAlchemy`, instead of manually writing the serv
 
 .. code-block:: python
 
-	from __plugin__.plugin.registry import addService
-	from __plugin__.sample_plugin.db_sample import alchemySessionCreator
-	from ally.container import support
-	from ally.support.sqlalchemy.session import bindSession
-	
-	# --------------------------------------------------------------------
-	
-	API, IMPL = 'sample_plugin.api.**.I*Service', 'sample_plugin.impl.**.*'
-	
-	support.createEntitySetup(API, IMPL)
-	
-	def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
-	support.listenToEntities(IMPL, listeners=addService(bindSampleSession,))
-	
-	support.loadAllEntities(API)
+    from __plugin__.plugin.registry import addService
+    from __plugin__.sample_plugin.db_sample import alchemySessionCreator
+    from ally.container import support
+    from ally.support.sqlalchemy.session import bindSession
+    
+    # --------------------------------------------------------------------
+    
+    API, IMPL = 'sample_plugin.api.**.I*Service', 'sample_plugin.impl.**.*'
+    
+    support.createEntitySetup(API, IMPL)
+    
+    def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
+    support.listenToEntities(IMPL, listeners=addService(bindSampleSession,))
+    
+    support.loadAllEntities(API)
 
 The variables ``API`` and ``IMPL`` contain the Aspect-Oriented signatures for the services:
 
@@ -34,9 +34,9 @@ The ``createEntitySupport`` function creates entity setup functions that would o
 
 .. code-block:: python
 
-        @ioc.entity
-        def IUserService() -> IUserService:# The API service interface
-        return UserService() # The service implementation that inherits the API service
+    @ioc.entity
+    def IUserService() -> IUserService:# The API service interface
+    return UserService() # The service implementation that inherits the API service
 
 The entity setup function is automatically generated for any pair of service classes that have an API class and an IMPL class that inherits from the API.  The support function ``listenToEntities`` provides the instances of these classes as services, when the entity is created. The function ``addService`` from the plugin component returns a callable function that is used as the listener, this callable creates a proxy for the event instance and then calls the ``bindSampleSession`` function which binds the session creator to the proxy. 
 
