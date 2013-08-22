@@ -195,9 +195,9 @@ Content-Type
 BODY
    .. code-block:: xml
 
-   <User>
-       <Name>John Doe</Name>
-   </User>
+       <User>
+          <Name>John Doe</Name>
+       </User>
 
 And verify that response is 
 
@@ -242,7 +242,7 @@ Content-Type
 Body 
     .. code-block:: xml
 
-    <User>
+        <User>
    		<Name>John Doe</Name>
    		<Type>1</Type>
    	</User>

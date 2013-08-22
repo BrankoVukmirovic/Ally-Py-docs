@@ -108,13 +108,13 @@ IEntityFindService      -                     getAll                  a model   
 IEntityQueryService     -                     getAll                  a model and a query   Provides the get all entities service with a query object
 IEntityCRUDService      -                     insert, update, delete  a model               Provides the entity CRUD service 
 IEntityGetCRUDService   IEntityGetService,    getById, insert,update  a model               Just combines the interfaces, no additional call methods
-    	        IEntityCRUDService    delete                        
+    	        	IEntityCRUDService    delete                        
 IEntityNQService        IEntityGetService,    getById, getAll,insert, a model               Just combines the interfaces, no additional call methods
-    		IEntityFindService,   update,delete
-    		IEntityCRUDService 
+    			IEntityFindService,   update,delete
+    			IEntityCRUDService 
 IEntityService          IEntityGetService,    getById, getAll,insert, a model and a query   Just combines the interfaces, no additional call methods
-    		IEntityQueryService,  update, delete
-    		IEntityCRUDService 
+    			IEntityQueryService,  update, delete
+    			IEntityCRUDService 
 ======================= ===================== ======================= ===================== =====================================
 
 Beside the fact that the user service extend the entity service you also notice that when we decorate the service we provide two tuples, the role of this is to provide generic replacing, what it will happen is that every type annotation that contains Entity for example Entity, Entity.Id, Iter(Entity), it will get replaced with User so the examples will look like User, User.Id, Iter(User), the same thing will happen with the query also.
