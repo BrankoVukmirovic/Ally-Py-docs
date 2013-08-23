@@ -8,7 +8,7 @@ Continuing the example from :ref:`AOP`, we look at some support modules that sim
 add to python path:
     ``distribution/plugins/support-sqlalchemy.1.0.egg``
 
-Looking at the code in the global configuration plugin ``example.__plugin__.example.db_example.py``:
+Looking at the database configuration code in the common plugin ``example.__plugin__.example.db_example.py``:
 
 .. code-block:: python 
 
@@ -36,11 +36,9 @@ Looking at the code in the global configuration plugin ``example.__plugin__.exam
     def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
     def bindSampleValidations(proxy): bindValidations(proxy, mappingsOf(meta))
 
-.. TODO:: [SW] I need to fix this!
+The database configuration is loaded from a common plugin used by multiple plugins. It replaces the IoC function with one that provides a default database url, and replaces the metas function with one that provides a list of meta plugins.  ``bindSampleSession`` performs input and output validation for REST services. Do not bind proxies meant for internal use so as not to decrease performance. 
 
-We are actually using here an already made database configuration module database_config found in the support modules, we just include this configuration, it will be just like copying the code from database_config and pasting it in the db_sample module. Next we are actually replacing the database_url configuration function, for this we have the replace ioc function which allows the replacement of an already defined entity or configuration setup functions, so even though the database_url is defined in database_config it has no default value and we just need to replace it to provide one. Next we need to provide the meta where all the plugin tables have been defined in order to automatically create the tables, so we are replacing the metas setup function with one that provides the list of the meta plugins (just in case we have more then one). Last we have the binding functions, the bindSampleSession is the one that was previously defined in the service setup module. The bindSampleValidations is actually performing the validations for insert and update, the validations consist in checking for unique constraints and foreign keys of the model to be inserted/updated. The validation process actually checks in the database if the unique/foreign key constraint is valid if not it will deliver a user friendly translatable error message, so it is important to bind the validations only to the proxies that are used as REST services, for the proxies that are to be used internally you should not bind the validation since it will have an impact on performance.
-
-Configuring the global service ``example.__plugin__.example.service.py``:
+Configuring the service in the common plugin ``example.__plugin__.example.service.py``:
 
 .. code-block:: python 
 
