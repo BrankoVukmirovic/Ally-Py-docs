@@ -1,14 +1,8 @@
 Associating and Extending Models
 =====================================
 
-Associating two models implies that one model contains a reference to another model. This requires modifcation of that model's API and meta functions.
+Associating two models implies that one model contains a reference to another model. This requires modification of that model's API and meta functions.
 
-.. TODO:: [SW] Not sure how the 00 plugin works with these last two plugin examples
-.. TODO:: [SW] Also, why example not sample, and why alter the directory structure, ie example/user/api 
-
-.. 
-        The association of two models means that one model contains a reference(id) of another model the association can be optional or mandatory.  The association of two models only require the modification of the models APIs and the meta's. We will use the last sample from "05 - sql alchemy support" chapter, 
-        
 To associate a UserType model to the User model we need to create an API and implementation for the UserType as we did for the User model in ``example.user.api.user_type.py``:
 
 .. code-block:: python
@@ -65,7 +59,7 @@ The UserType API, is similar to the User API. We also need to edit ``example.use
         Id = Column('id', INTEGER(unsigned=True), primary_key=True)
         Name = Column('name', String(20), nullable=False, unique=True)
 
-``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implentation in ``example.user.impl.user_type.py``:
+``sample_user_type`` table is similar to ``sample_user table`` except that ``name`` is declared as a unique column, we don't want multiple types with the same name. Lastly we need to write the implementation in ``example.user.impl.user_type.py``:
 
 .. code-block:: python
 

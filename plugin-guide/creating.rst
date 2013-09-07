@@ -41,7 +41,7 @@ To make the class recognizable by the Ally.py framework, edit the previous code 
 
 Without a domain, the model is accessible at `User <http://localhost/resources/User>`_ , but with domain set to 'Sample' the domain is accessible at `Sample/User <http://localhost/resources/Sample/User>`_.
 
-To reuse a domain definition in various modules or plugins, define a domained model decorator in the ``sample_plugin.api.__init__.py`` module:
+To reuse a domain definition in various modules or plugins, define a domain model decorator in the ``sample_plugin.api.__init__.py`` module:
 
 .. code-block:: python
 
@@ -100,7 +100,7 @@ To complement the model, we need to add a service to deliver instances of the mo
             Provides all the users.
             '''
 
-All service interface names start with a capital 'I' followed by the service name and ending in 'Service' and are decorated with ``@service``. This convention simplifies Ally.py inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annoted with the return type. In the previous example, the return type is an interable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
+All service interface names start with a capital 'I' followed by the service name and ending in 'Service' and are decorated with ``@service``. This convention simplifies Ally.py inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annotated with the return type. In the previous example, the return type is an iterable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
 
 .. TODO:: 
         [SW] This is not totally clear to me. "framework, also each method definition that needs to be considered as exposing response models needs to be decorated with call. We need to annotate the method with the return type of the method in this case is an iterable collection that contains User models. The ally framework uses"
@@ -119,7 +119,7 @@ After defining the API we can create an implementation based upon it, returning 
         </User>
     </UserList>
 
-To achieve this, edit the user implementation in ``sample_plugin.impl.user.py`` :
+Edit the user implementation in ``sample_plugin.impl.user.py`` :
 
 .. code-block:: python 
 

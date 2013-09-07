@@ -3,7 +3,7 @@
 Plugin structure
 ================
 
-All plugins have the same intial file structure:
+All plugins have the same initial file structure:
 
 * ``plugin`` # the setup package
    + ``__init__.py`` # the init module of the package

@@ -36,7 +36,7 @@ Looking at the database configuration code in the common plugin ``example.__plug
     def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
     def bindSampleValidations(proxy): bindValidations(proxy, mappingsOf(meta))
 
-The database configuration is loaded from a common plugin used by multiple plugins. It replaces the IoC function with one that provides a default database url, and replaces the metas function with one that provides a list of meta plugins.  ``bindSampleSession`` performs input and output validation for REST services. Do not bind proxies meant for internal use so as not to decrease performance. 
+The database configuration is loaded from a common plugin used by multiple plugins. It replaces the IoC function with one that provides a default database URL, and replaces the ``metas`` function with one that provides a list of meta plugins.  ``bindSampleSession`` performs input and output validation for REST services. Do not bind proxies meant for internal use so as not to decrease performance. 
 
 Configuring the service in the common plugin ``example.__plugin__.example.service.py``:
 

@@ -5,7 +5,7 @@ Using SQLAlchemy
 
 ..  Example 03_-_using_sql_alchemy_plugin_sample
 
-Continuing the example from :ref:`Creating`, we will make user model persistant by storing it in a database. We need to add the SQLAlchemy egg to the python path. 
+Continuing the example from :ref:`Creating`, we will make user model persistent by storing it in a database. We need to add the SQLAlchemy egg to the python path. 
 
 add to python path
         ``distribution/libraries/SQLAlchemy-0.7.1-py3.2.egg``
@@ -257,7 +257,7 @@ Define the database setup module in ``__plugin__.sample_plugin.db_sample.py``:
 
 Sessions are created using the session creator whenever a service API method is invoked. After the method has been invoked the session is closed, either with a commit (when no exception has occurred) or with a rollback (if an exception has occured).
 
-To prevent multiple methods using the same session, we need to wrap the service implementionation in a proxy in ``__plugin__.sample_plugin.service.py``:
+To prevent multiple methods using the same session, we need to wrap the service implementation in a proxy in ``__plugin__.sample_plugin.service.py``:
 
 .. TODO:: [SW] Not really sure why wrapping this in a proxy fixes the problem.
  
@@ -285,7 +285,7 @@ To prevent multiple methods using the same session, we need to wrap the service 
     def register():
         registerService(userService())
 
-Instead of returning the instance of UserService directly, a proxy containing all the of the methods definied in the API service interface ``IuserService`` is returned. The proxy delegates calls to the actual user service implementation and handles the session management for all the methods.
+Instead of returning the instance of UserService directly, a proxy containing all the of the methods defined in the API service interface ``IuserService`` is returned. The proxy delegates calls to the actual user service implementation and handles the session management for all the methods.
         
 Now when you run the application you see ``sample.db`` inside the distribution folder. If you access `resources/Sample/User <http://localhost/resources/Sample/User>`_ the response is an empty list, because there are no user in the database.
 
