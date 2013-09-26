@@ -9,6 +9,8 @@ It will contain various documents, each in a separate directory:
 * Plugin Guide (in `plugin_guide` directory)
 * Howto (not yet available)
 
+To create a new document, run `sphinx-quickstart` and specify the subdirectory name, for example `reference`. Most options can be left as defaults, or edited later in conf.py if needed.
+
 Documentation is generated using [Sphinx](http://sphinx-doc.org/), and written in [reStructuredTex](http://sphinx-doc.org/rest.html).
 
 To generate an HTML version of the documentation: 
