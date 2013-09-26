@@ -100,15 +100,12 @@ To complement the model, we need to add a service to deliver instances of the mo
             Provides all the users.
             '''
 
-All service interface names start with a capital 'I' followed by the service name and ending in 'Service' and are decorated with ``@service``. This convention simplifies Ally.py inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annotated with the return type. In the previous example, the return type is an iterable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
-
-.. TODO:: 
-        [SW] This is not totally clear to me. "framework, also each method definition that needs to be considered as exposing response models needs to be decorated with call. We need to annotate the method with the return type of the method in this case is an iterable collection that contains User models. The ally framework uses"
+All service interface names start with a capital 'I' followed by the service name and end in 'Service' and are decorated with ``@service``. This convention simplifies inversion of control and aspect oriented programming configuration. Each method that exposes a response model is decorated with ``@call`` and annotated with the return type. In the previous example, the return type is an iterable collection of User models.  The Ally.py framework maps annotated return and input types to a path invoking the corresponding service method. All service methods, even those not exposed using the ``@call`` decorator must have input and return types annotated. 
 
 Implementing the API
 ----------------------------------------------
 
-After defining the API we can create an implementation based upon it, returning a list with one user model at the address `Sample/User <http://localhost/resources/Sample/User>`_:
+After defining the API, create an implementation based upon it, returning a list with one user model at the address `Sample/User <http://localhost/resources/Sample/User>`_:
 
 .. code-block:: xml
 
@@ -147,11 +144,9 @@ Creating the configuration
 
 After defining the API and the implementation of the API, use the dependency injection container to expose the API through the HTTP REST interface of the Ally.py framework. Create the module ``service`` in package ``__plugin__.sample_plugin.service.py`` 
 
-We have defined a setup function decorated with ``@ioc.entity`` that delivers the implementation instance of ``UserService`` for the ``IUserService`` api.  Because this function is decorated with the ioc.entity decorator it will be used as a entity source by the DI container. 
+The setup function decorated with ``@ioc.entity`` delivers the implementation instance of ``UserService`` for the ``IUserService`` api.  Because this function is decorated with the ``ioc.entity`` decorator it will be used as a entity source by the dependency injection container. 
 
-The ``register`` method registers the user service implementation instance which is obtained by invoking the DI entity function ``userService``.
-
-.. TODO:: [SW] What is DI in this case?
+The ``register`` method registers the user service implementation instance which is obtained by invoking the dependency injection function ``userService``.
 
 ``__plugin__.sample_plugin.service.py``:
 
@@ -177,9 +172,7 @@ The ``register`` method registers the user service implementation instance which
 Packaging and Deploying
 -----------------------
 
-The plugin is now fully functional, but we need to package it up for deployment to the application using ``build-plugin.ant`` :
-
-The ant script creates ``02 - plugin sample.1.0.egg`` in the plugin ``source`` folder. To deploy the plugin, copy the file into the ``distribution/plugin/`` folder of your application. If the application is running on localhost port 80, access your plugin at http://localhost/resources and verify that the resource SampleUser exists:
+The plugin is now fully functional. Package it for deployment to the application using ``build-plugin.ant``.  The ant script creates ``02 - plugin sample.1.0.egg`` in the plugin ``source`` folder. To deploy the plugin, copy the file into the ``distribution/plugin/`` folder of your application. If the application is running on localhost port 80, access your plugin at http://localhost/resources and verify that the resource SampleUser exists:
 
 .. code-block:: xml
 
@@ -227,14 +220,11 @@ To filter the list of users use ``@query`` as shown in ``sample_plugin.api.user.
         
         @call
         def getUsers(self, q:QUser=None) -> Iter(User):
-    	'''
-    	Provides all the users.
-    	'''
+       	    '''
+    	    Provides all the users.
+    	    '''
 
-Query objects are like a models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
-
-.. TODO::
-    [SW] Needs update above.
+Query objects are like models that contains data used for filtering. Queries have the name of the model and are prefixed with 'Q', and attributes are lower case to avoid confusion with the model attributes. Query attribute values are the criteria class of the model attribute. ``AsLike`` enables filtering and ordering on an attribute.
 
 The ``getUsers`` method now takes an query object instance as an optional parameter (with a default value of None). It is good practice to specify a default value for all query objects used in service methods, as queries are optional. In ``sample_plugin.impl.user.py``:
 

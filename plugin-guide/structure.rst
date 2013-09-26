@@ -26,18 +26,17 @@ The two main components are described below in more detail:
 
 Plugins also contain an ant build file called ``build-plugin.ant`` which packages the plugin to an egg file used by the application distribution.
 
-The plugin package _plugin_
+The plugin package __plugin__
 -----------------------------
 
-The ``_plugin_`` package contains only the init module, which contains a description ``doc`` and a single package ``plugin.<unique package>``. 
+The ``__plugin__`` package contains only the init module, which contains a description ``doc`` and a single package ``plugin.<unique package>``. 
 The unique package is usually the plugin <main package> but if the main package is the same for multiple plugins we have to use a composition of this main package because the unique package within the plugin needs to be unique among all plugins, also this package name is used as the plugin id. 
 
-For example the introspection functionality in Ally.py is provided by two plugins:
+.. 
+	For example the introspection functionality in Ally.py is provided by two plugins:
+	* ``__plugin__.introspection`` which provides the components and plugins that are active in the current distribution 
+	* ``__plugin__.introspection_request`` the introspection for the possible requests that can be made
 
-* ``plugin.introspection`` which provides the components and plugins that are active in the current distribution 
-* ``plugin_.introspection_request`` the introspection for the possible requests that can be made
-
-.. TODO:: [SW] Not sure about the difference here?
 
 The main package for both plugins is ``introspection``, which contains all the configuration modules. The Inversion of Control dependency injection container ignores any subpackages.
 

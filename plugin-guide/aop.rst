@@ -3,7 +3,7 @@
 Using Aspect-Oriented Programming
 ============================================================
 
-Although dependency injection programming requires a lot of configuration code, the Ally.py framework reduces the need for plugin configuration by using Aspect-Oriented programming.
+Although dependency injection programming requires a lot of configuration code, the Ally.py framework reduces the amount of plugin configuration using Aspect-Oriented programming.
 
 Editing the example from :ref:`SQLAlchemy`, instead of manually writing the service instance function for UserService we use naming conventions and use Aspect-Oriented programming to configure the plugin ``__plugin__.sample_plugin.service.py``:
 

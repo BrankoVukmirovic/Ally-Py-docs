@@ -36,7 +36,7 @@ Looking at the database configuration code in the common plugin ``example.__plug
     def bindSampleSession(proxy): bindSession(proxy, alchemySessionCreator())
     def bindSampleValidations(proxy): bindValidations(proxy, mappingsOf(meta))
 
-The database configuration is loaded from a common plugin used by multiple plugins. It replaces the IoC function with one that provides a default database URL, and replaces the ``metas`` function with one that provides a list of meta plugins.  ``bindSampleSession`` performs input and output validation for REST services. Do not bind proxies meant for internal use so as not to decrease performance. 
+The database configuration is loaded from a common plugin used by multiple plugins. It replaces the inversion of control function with one that provides a default database URL, and replaces the ``metas`` function with one that provides a list of meta plugins. ``bindSampleSession`` performs input and output validation for REST services. Do not bind proxies meant for internal use so as not to decrease performance. 
 
 Configuring the service in the common plugin ``example.__plugin__.example.service.py``:
 
@@ -57,7 +57,7 @@ Configuring the service in the common plugin ``example.__plugin__.example.servic
 
     support.loadAllEntities(API)
 
-So we got rid of the bindSampleSession since is now defined in the db_sample setup module. We are calling a new support function bindToEntities, this will actually create proxies for all entities setup functions that return an instance that with the class found in IMPL, this will apply to the user defined entities setups functions and also to the automatically created entities setup functions. This proxies will be used whenever another service requires internally an instance of a service having a class from IMPL so this is why we only bind to this proxies the session. The listen to entities that adds the services to the REST framework is now binding to the proxies services the session and also the validation, keep in mind that this proxies are only used for external requests. You can find the sample here. 
+``binSampleSession`` is now defined in the ``db_sample`` setup module. The support funtion ``bindToEntities`` creates a proxy for all user defined and auto generated entity setup functions that return an instance with a class from implementation. The proxies are used whenever another service accesses an implementation service. The ``listenToEntities`` function binds the REST services to the proxy session and provides validation, for external requests only. 
 
 Adding the API configuration ``example-user.example.user.api.user.py``:
 
