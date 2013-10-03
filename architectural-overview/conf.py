@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Ally.Py Architectural Overview'
+project = 'Ally-py Architectural Overview'
 copyright = '2013, GN, SW'
 
 # The version info for the project you're documenting, acts as replacement for

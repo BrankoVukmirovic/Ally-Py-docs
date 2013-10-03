@@ -3,7 +3,7 @@
 Application Layout
 ==================
 
-The all-py framework is constructed from components and plugins in order to allow for a flexible, layered and well organized customization of features.
+The Ally-Py framework is constructed from components and plugins in order to allow for a flexible, layered and well organized customization of features.
 The first problem in having an application formed of smaller parts like in our case the components and plugins is how you can bring them together to function as one, in this respect
 we use the inversion of control [IoC]_ pattern. To handel the [IoC]_ we created a container that handles this, the implementation is found in the core component ``ally`` in package
 ``ally.container``. A general approach in [IoC]_ is to use XML configuration files, but this container is designed to be used with standard python modules.
