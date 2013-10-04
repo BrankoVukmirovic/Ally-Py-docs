@@ -59,14 +59,12 @@ In an enterprise application you need to have the ability to scale, so the compo
 
 Now the [REST]_ application is on one server and the content delivery management service is on a different server.
 
-What is the point for this?
+Component separation enables support both normal users and enterprise level customers, but using different combinations of plugins and components:
 
-First of all we can deliver the application as a simple all together python application with no external dependencies (outside python libraries) to normal users that do not have such high traffic and only want
-and easy to install application that can serve their needs at this point.
-If the user has a great success and the traffic demands increase we also are able to scale by simply externalizing the static file delivery system to more powerful system and event more then that by externalizing the
-proxy servers (gateway and aggregation) or sardining the RESTful server.
-For instance we use [0MQ]_ as the application messaging service with [Mongrel2]_ as the server we can start as many application instances as we need depending on the traffic since the RESTful server is stateless.
-The main goal here is to address the needs of normal users but also the needs of enterprise level customers by using the same plugins and components.
+* Delivery of the application as an easy to install single python application with no external dependencies for use in a low traffic environment. 
+* Delivery of a scalable application where you can easily separate the content delivery service, proxy server and [REST]_ server. 
+
+If we use [0MQ]_ as the application messaging service with [Mongrel2]_ as the server we can start as many application instances as we need depending on the traffic since the RESTful server is stateless.
 
 The content file system service is a simple one, for the other services we usually need more information that is provided by the core plugins. A plugin is like a component except that the purpose of the plugin
 is to publish REST models rather then influence the application behavior.
