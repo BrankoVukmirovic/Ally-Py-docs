@@ -29,7 +29,7 @@ Plugins also contain an ant build file called ``build-plugin.ant`` which package
 The plugin package __plugin__
 -----------------------------
 
-The ``__plugin__`` package contains only the init module, which contains a description ``doc`` and a single package ``plugin.<unique package>``. 
+The ``__plugin__`` package contains only the init module, which contains a description ``doc`` and a single package ``__plugin__.<unique package>``. 
 The unique package is usually the plugin <main package> but if the main package is the same for multiple plugins we have to use a composition of this main package because the unique package within the plugin needs to be unique among all plugins, also this package name is used as the plugin id. 
 
 .. 
@@ -40,10 +40,9 @@ The unique package is usually the plugin <main package> but if the main package 
 
 The main package for both plugins is ``introspection``, which contains all the configuration modules. The Inversion of Control dependency injection container ignores any subpackages.
 
-The ``plugin.<unique package>.init`` module contains the following global variables:
+The ``__plugin__.<unique package>.init`` module contains the following global variables:
 
 * NAME a short descriptive name for the plugin.
-* GROUP used to define a collection of plugins that have a common purpose. 
 * VERSION is a string of the form '1.2' where 1 is the major version of the plugin and 2 is the minor version. The minor version changes for every plugin release. The major version changes only when there are significant changes to the plugin.
 * DESCRIPTION a short explanation of the functionality of the plugin.
 
