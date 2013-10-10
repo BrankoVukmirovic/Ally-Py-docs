@@ -41,7 +41,7 @@ Ally-Py components:
 .. TODO::
 	Need more info on some of these. indexing?
 
-Splitting All-Py into components means that application deployment can be done in various ways.
+Givn that All-Py consistso of components, application deployment can be done in various ways.
 
 Consider the example of a [REST]_ application compsed of ``ally``, ``ally-http``, ``ally-api``, ``ally-core``, ``ally-core-http``, ``ally-plugin`` and some custom **plugins**. This is enough to implement simple plugins, and does not requre database support, security, data aggregation or content delivery.
 
