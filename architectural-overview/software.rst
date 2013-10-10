@@ -3,7 +3,7 @@
 Application Layout
 ==================
 
-The Ally-Py framework is constructed from components and plugins to facilitate customization. To make the separate parts function as a unified whole, Ally-Py uses Inversion of Control design patterns. The Inversion of Control container, which uses standard python modules not xml configuration files, is implemented in the core component ``ally`` in the package ``ally.container``. 
+The Ally-Py framework is constructed from components and plugins to facilitate customization. To make the separate parts function as a unified whole, Ally-Py uses Inversion of Control design patterns. The Inversion of Control container, which uses standard python modules instead of XML configuration files, is implemented in the core component ``ally`` in the package ``ally.container``. 
 
 Ally-Py components:
 
