@@ -1,6 +1,6 @@
 .. _software:
 
-Application Layout
+Ally-Py Overview
 ==================
 
 The Ally-Py framework is constructed from components and plugins to facilitate customization. To make the separate parts function as a unified whole, Ally-Py uses Inversion of Control design patterns. The Inversion of Control container, which uses standard python modules instead of XML configuration files, is implemented in the core component ``ally`` in the package ``ally.container``. 
@@ -70,7 +70,7 @@ Component separation and use of different combinations of plugins lets Ally-Py b
 .. TODO:: 
 	Is this important? 
 
-Plugin Overview
+Plugins Overview
 --------------------------------
 
 Plugins that provide REST responses depend on ``ally-api``. Other core plugins used by the proxy services ``service-assemblage`` and ``service-gateway`` are described in the following table:
@@ -89,19 +89,20 @@ Plugins that provide REST responses depend on ``ally-api``. Other core plugins u
 | ``indexing``                        | ``ally-api``, \[``ally-core``\]                  | Provides the Indexing API and the REST models content response                                                              |
 +-------------------------------------+--------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
 
-For instance ``service-gateway`` needs to know what URLs are allowed anonymous access and which URLs are allowed login access, this information is provided also through a RESTful service:
+The ``service-gateway`` needs to know what REST URLs are allowed anonymous access and which URLs are allowed authenticated access, this information is provided also through a RESTful service:
 
-* The ``service-gateway`` fetches a list of gateways allowed anonymous access from the RESTful server. All incoming requests are checked against the list of allowed gateways. 
-*  In case of user based access the process also involves an authentication of the user with the REST server, based on this process the client receives a session id that the gateway will then recognize. The REST server also provides a list of gateways based on a session id. Even though the REST server (actually the security plugin) stores and manages the session id it never acts on it, like restricting information or providing other data based on this. Actually the security plugin is like a normal plugin is just that his API is recognized and can be used by the gateway service. 
+* The ``service-gateway`` fetches a list of REST URLs allowed anonymous access from the RESTful server. All incoming requests are checked against the list of allowed gateways. 
+* Requests from authenticated users have a session id recognized by the ``service-gateway``. The REST server provides a list of REST URLs based on the session id. The security plugin of the REST server stores and manages the session id, but the gateway acts upon it.
 
-Separate Gateway Example
+External Gateway Example
 ----------------------------------------
 
-The gateway service can be implemented as any external application that compares the list of allowed gateways provided by the REST server.
+The gateway service can be implemented as any external application that compares the request to the list of allowed gateways provided by the REST server.
 
-The following image shows a distribution layout composed of two web servers:
-* a gateway proxy that validates the authorization for a certain resource based on information provided by the gateway core plugin
-* the REST server. 
+The following image shows a distributed layout composed of two web servers:
+
+* a gateway server that authorizes requests based on information provided by the gateway core plugin.
+* a REST server the returns the models. 
 
 .. image:: images/application-with-gateway.jpg
 
