@@ -102,7 +102,7 @@ The gateway service can be implemented as any external application that compares
 The following image shows a distributed layout composed of two web servers:
 
 * a gateway server that authorizes requests based on information provided by the gateway core plugin.
-* a REST server the returns the models. 
+* a REST server that returns the data models. 
 
 .. image:: images/application-with-gateway.jpg
 
