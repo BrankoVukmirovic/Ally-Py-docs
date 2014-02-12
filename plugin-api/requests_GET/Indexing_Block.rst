@@ -3,13 +3,16 @@
 **Indexing/Block**
 ==========================================================
 
- * The request is defined by API call ``indexing.api.indexing.IIndexingService.getBlocks``
+* Use the HTTP **GET** method
+* The request is defined by API call ``indexing.api.indexing.IIndexingService.getBlocks``
 
- * The request will GET a collection of references to models ``indexing.api.indexing.Block``
+* The request will GET a collection of references to models :ref:`entity-indexing.api.indexing.Block`
 
-URL parameters
--------------------------------------
-TODO:
+::
+
+   Provides all indexing blocks.
+
+
 
 
 Query parameters

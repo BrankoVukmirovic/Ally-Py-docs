@@ -3,14 +3,22 @@
 **Indexing/Block/***
 ==========================================================
 
- * The request is defined by API call ``indexing.api.indexing.IIndexingService.getBlock``
+* Use the HTTP **GET** method
+* The request is defined by API call ``indexing.api.indexing.IIndexingService.getBlock``
 
   
- * The request will GET a model ``indexing.api.indexing.Block``
+* The request will GET a model :ref:`entity-indexing.api.indexing.Block`
+
+::
+
+   Provides the block for id.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Block.Id** from :ref:`entity-indexing.api.indexing.Block`.
 
 
 Query parameters

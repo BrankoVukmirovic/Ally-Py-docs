@@ -3,14 +3,24 @@
 **Security/Right/*/Access/*/Property/***
 ==========================================================
 
- * The request is defined by API call ``admin.introspection.api.model.IModelService.getProperty``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.access.IAccessService.getProperty``
 
   
- * The request will GET a model ``admin.introspection.api.model.Property``
+* The request will GET a model :ref:`entity-acl.api.access.Property`
+
+::
+
+   Provides the input property with the provided name and access.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Right.Id** from :ref:`entity-security.api.right.Right`.
+* The unique identifier **Access.Id** from :ref:`entity-acl.api.access.Access`.
+* The unique identifier **Property.Name** from :ref:`entity-acl.api.access.Property`.
 
 
 Query parameters

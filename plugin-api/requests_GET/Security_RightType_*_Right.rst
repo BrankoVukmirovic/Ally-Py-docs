@@ -3,13 +3,21 @@
 **Security/RightType/*/Right**
 ==========================================================
 
- * The request is defined by API call ``security.api.right.IRightService.getAll``
+* Use the HTTP **GET** method
+* The request is defined by API call ``security.api.right.IRightService.getAll``
 
- * The request will GET a collection of references to models ``security.api.right.Right``
+* The request will GET a collection of references to models :ref:`entity-security.api.right.Right`
+
+::
+
+   Provides the rights searched by the provided query.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **RightType.Name** from :ref:`entity-security.api.right_type.RightType`.
 
 
 Query parameters

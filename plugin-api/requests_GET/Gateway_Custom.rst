@@ -3,13 +3,21 @@
 **Gateway/Custom**
 ==========================================================
 
- * The request is defined by API call ``gateway.api.gateway.IGatewayService.getAll``
+* Use the HTTP **GET** method
+* The request is defined by API call ``gateway.api.gateway.IGatewayService.getAll``
 
- * The request will GET a collection of references to models ``gateway.api.gateway.Custom``
+* The request will GET a collection of references to models :ref:`entity-gateway.api.gateway.Custom`
 
-URL parameters
--------------------------------------
-TODO:
+::
+
+   Provides the entities identifiers.
+   
+   @param options: @see: SliceAndTotal
+       The options to fetch the entities with.
+   @return: Iterable(object)
+       The iterable with the entities identifiers.
+
+
 
 
 Query parameters

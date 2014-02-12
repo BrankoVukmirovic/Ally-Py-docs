@@ -3,13 +3,21 @@
 **Indexing/Action/*/Perform**
 ==========================================================
 
- * The request is defined by API call ``indexing.api.indexing.IIndexingService.getPerforms``
+* Use the HTTP **GET** method
+* The request is defined by API call ``indexing.api.indexing.IIndexingService.getPerforms``
 
- * The request will GET a collection of references to models ``indexing.api.indexing.Perform``
+* The request will GET a collection of references to models :ref:`entity-indexing.api.indexing.Perform`
+
+::
+
+   Provides all performs for action id.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Action.Id** from :ref:`entity-indexing.api.indexing.Action`.
 
 
 Query parameters

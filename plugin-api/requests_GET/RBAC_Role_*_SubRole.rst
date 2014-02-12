@@ -3,13 +3,30 @@
 **RBAC/Role/*/SubRole**
 ==========================================================
 
- * The request is defined by API call ``security.rbac.api.role_rbac.IRoleRbacService.getRoles``
+* Use the HTTP **GET** method
+* The request is defined by API call ``security.rbac.api.role_rbac.IRoleRbacService.getRoles``
 
- * The request will GET a collection of references to models ``security.rbac.api.role.Role``
+* The request will GET a collection of references to models :ref:`entity-security.rbac.api.role.Role`
+
+::
+
+   Provides the roles for the provided identifier.
+   
+   @param identifier: object
+       The RBAC object identifier to provide the roles for.
+   @param q: QRole|None
+       The query to apply on the roles.
+   @param options: key arguments
+       The result iteration options.
+   @return: Iterable(Role.Name)
+       An iterator containing the role names.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Role.Name** from :ref:`entity-security.rbac.api.role.Role`.
 
 
 Query parameters

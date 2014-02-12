@@ -3,14 +3,25 @@
 **Localization/Language/***
 ==========================================================
 
- * The request is defined by API call ``superdesk.language.api.language.ILanguageService.getById``
+* Use the HTTP **GET** method
+* The request is defined by API call ``internationalization.language.api.language.ILanguageService.getById``
 
   
- * The request will GET a model ``superdesk.language.api.language.Language``
+* The request will GET a model :ref:`entity-internationalization.language.api.language.Language`
+
+::
+
+   Provides the entity based on the identifier.
+   
+   @param identifier: object
+       The id of the entity to find.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Language.Code** from :ref:`entity-internationalization.language.api.language.Language`.
 
 
 Query parameters

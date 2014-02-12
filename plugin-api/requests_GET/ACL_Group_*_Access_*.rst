@@ -3,14 +3,26 @@
 **ACL/Group/*/Access/***
 ==========================================================
 
- * The request is defined by API call ``acl.api.access.IAccessService.getById``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.access.IAccessService.getById``
 
   
- * The request will GET a model ``acl.api.access.Access``
+* The request will GET a model :ref:`entity-acl.api.access.Access`
+
+::
+
+   Provides the entity based on the identifier.
+   
+   @param identifier: object
+       The id of the entity to find.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Group.Name** from :ref:`entity-acl.api.group.Group`.
+* The unique identifier **Access.Id** from :ref:`entity-acl.api.access.Access`.
 
 
 Query parameters

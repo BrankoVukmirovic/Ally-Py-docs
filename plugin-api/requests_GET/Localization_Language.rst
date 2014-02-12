@@ -3,13 +3,23 @@
 **Localization/Language**
 ==========================================================
 
- * The request is defined by API call ``superdesk.language.api.language.ILanguageService.getAll``
+* Use the HTTP **GET** method
+* The request is defined by API call ``internationalization.language.api.language.ILanguageService.getAll``
 
- * The request will GET a collection of references to models ``superdesk.language.api.language.Language``
+* The request will GET a collection of references to models :ref:`entity-internationalization.language.api.language.Language`
 
-URL parameters
--------------------------------------
-TODO:
+::
+
+   Provides the entities identifiers searched by the provided query.
+   
+   @param q: Query|None
+       The query to search by.
+   @param options: @see: SliceAndTotal
+       The options to fetch the entities with.
+   @return: Iterable(object)
+       The iterable with the entities identifiers.
+
+
 
 
 Query parameters

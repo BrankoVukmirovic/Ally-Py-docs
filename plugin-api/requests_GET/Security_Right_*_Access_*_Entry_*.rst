@@ -3,14 +3,24 @@
 **Security/Right/*/Access/*/Entry/***
 ==========================================================
 
- * The request is defined by API call ``acl.api.access.IAccessService.getEntry``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.access.IAccessService.getEntry``
 
   
- * The request will GET a model ``acl.api.access.Entry``
+* The request will GET a model :ref:`entity-acl.api.access.Entry`
+
+::
+
+   Provides the path dynamic entry for access and position.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Right.Id** from :ref:`entity-security.api.right.Right`.
+* The unique identifier **Access.Id** from :ref:`entity-acl.api.access.Access`.
+* The unique identifier **Entry.Position** from :ref:`entity-acl.api.access.Entry`.
 
 
 Query parameters

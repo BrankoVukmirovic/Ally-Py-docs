@@ -3,13 +3,23 @@
 **ACL/Access**
 ==========================================================
 
- * The request is defined by API call ``acl.api.access.IAccessService.getAll``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.access.IAccessService.getAll``
 
- * The request will GET a collection of references to models ``acl.api.access.Access``
+* The request will GET a collection of references to models :ref:`entity-acl.api.access.Access`
 
-URL parameters
--------------------------------------
-TODO:
+::
+
+   Provides the entities identifiers searched by the provided query.
+   
+   @param q: Query|None
+       The query to search by.
+   @param options: @see: SliceAndTotal
+       The options to fetch the entities with.
+   @return: Iterable(object)
+       The iterable with the entities identifiers.
+
+
 
 
 Query parameters

@@ -13,11 +13,11 @@ Accept
 Possible value(s) for the header are:
 
  * *xml*
- * *application/x-www-form-urlencoded*
  * *text/xml*
  * *text/json*
- * *application/xml*
+ * *application/x-www-form-urlencoded*
  * *json*
+ * *application/xml*
  * *application/json*
  * *text/plain*
 

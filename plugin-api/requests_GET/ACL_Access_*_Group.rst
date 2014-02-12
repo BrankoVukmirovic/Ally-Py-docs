@@ -3,13 +3,28 @@
 **ACL/Access/*/Group**
 ==========================================================
 
- * The request is defined by API call ``acl.api.group.IGroupService.getAcls``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.group.IGroupService.getAcls``
 
- * The request will GET a collection of references to models ``acl.api.group.Group``
+* The request will GET a collection of references to models :ref:`entity-acl.api.group.Group`
+
+::
+
+   Provides the ACL objects for the provided access id.
+   
+   @param accessId: integer
+       The access id to provide the ACL for.
+   @param options: key arguments
+       The result iteration options.
+   @return: Iterable(ACL.identifier)
+       An iterator containing the ACL objects identifiers.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Access.Id** from :ref:`entity-acl.api.access.Access`.
 
 
 Query parameters

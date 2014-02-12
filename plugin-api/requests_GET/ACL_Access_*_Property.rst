@@ -3,13 +3,21 @@
 **ACL/Access/*/Property**
 ==========================================================
 
- * The request is defined by API call ``acl.api.access.IAccessService.getProperties``
+* Use the HTTP **GET** method
+* The request is defined by API call ``acl.api.access.IAccessService.getProperties``
 
- * The request will GET a collection of references to models ``acl.api.access.Property``
+* The request will GET a collection of references to models :ref:`entity-acl.api.access.Property`
+
+::
+
+   Provides the input properties for access.
+
 
 URL parameters
 -------------------------------------
-TODO:
+Each entry matches a **\*** in their respective order.
+
+* The unique identifier **Access.Id** from :ref:`entity-acl.api.access.Access`.
 
 
 Query parameters

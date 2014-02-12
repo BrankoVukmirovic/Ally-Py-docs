@@ -9,11 +9,18 @@ Welcome to Ally-Py Core Plugins API documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    headers.rst
    headers_parameters.rst
+   index_models.rst
    index_requests_GET.rst
+   index_requests_POST.rst
+   index_requests_PUT.rst
+   index_requests_DELETE.rst
+   index_requests_LINK.rst
+   index_requests_UNLINK.rst
+   index_requests_DELETE.rst
    
 
 Indices and tables
