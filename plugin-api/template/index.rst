@@ -22,11 +22,11 @@ Contents:
    index_requests_UNLINK.rst {%- do render('_index_requests.rst', 'index_requests_UNLINK.rst', method='UNLINK', data=data, description='The URL\'s that unlinks RESTful models data') %}
    index_requests_DELETE.rst {%- do render('_index_requests.rst', 'index_requests_DELETE.rst', method='DELETE', data=data, description='The URL\'s that remove RESTful models data') %}
    
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
+
+..
+        Indices and tables
+        ==================
+        * :ref:`genindex`
+        * :ref:`modindex`
 
